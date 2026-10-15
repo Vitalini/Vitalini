@@ -1,7 +1,8 @@
+<!-- Hero: custom skyline (scripts/skyline.mjs). To switch back to the stock action, point the three paths at ./profile-3d-contrib/profile-night-view.svg (dark) and ./profile-3d-contrib/profile-gitblock.svg (light). -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./profile-3d-contrib/profile-night-view.svg">
-  <source media="(prefers-color-scheme: light)" srcset="./profile-3d-contrib/profile-gitblock.svg">
-  <img alt="Vitalii Borovyk's contributions as a 3D skyline" src="./profile-3d-contrib/profile-gitblock.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="./generated/skyline-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="./generated/skyline-light.svg">
+  <img alt="Vitalii Borovyk's contributions in the last year as a 3D skyline" src="./generated/skyline-light.svg" width="100%">
 </picture>
 
 ### Vitalii Borovyk

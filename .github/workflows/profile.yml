@@ -33,6 +33,12 @@ jobs:
           # No effect on #163 below 100 repositories: v0.9.3 always asks for 100 in its first query.
           MAX_REPOS: 100
 
+      - name: Custom contribution skyline
+        if: always()
+        run: node scripts/skyline.mjs --out generated
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Open-source impact card
         if: always()
         run: node scripts/oss-card.mjs --out generated --readme README.md
