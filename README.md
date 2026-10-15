@@ -7,7 +7,7 @@
 ### Vitalii Borovyk
 
 - Director of Frontend Engineering at [Talkable](https://www.talkable.com), referral and loyalty programs for 500+ US brands. Atlanta, GA.
-- Author of [ebb-ai](https://github.com/Vitalini/ebb-ai), a carbon-aware MCP scheduler for agentic AI.
+- Author of [EBB AI](https://ebb-ai.com), a carbon-aware MCP scheduler for agentic AI.
 - Author of the [Practical AI](https://www.amazon.com/stores/Vitalii-Borovyk/author/B0H24CJSV3) book series about using AI at work and in everyday life.
 - Writes about AI in engineering teams: [How AI helps me at work](https://www.talkable.com/blog/how-ai-helps-team-manager).
 
@@ -23,9 +23,9 @@
 </a>
 <!-- oss:end -->
 
-### ebb-ai
+### EBB AI
 
-[ebb-ai](https://github.com/Vitalini/ebb-ai) is a carbon-aware MCP scheduler for agentic AI. An agent hands it a task that can wait, and ebb-ai runs the task in the cleanest electricity-grid hour before the deadline. It ships as the npm package [`@ebb-ai/mcp`](https://www.npmjs.com/package/@ebb-ai/mcp) and is listed on [Glama](https://glama.ai/mcp/servers/Vitalini/ebb-ai) with an A score.
+[EBB AI](https://ebb-ai.com) is a carbon-aware MCP scheduler for agentic AI. An agent hands it a task that can wait, and EBB AI runs the task in the cleanest electricity-grid hour before the deadline. Source on [GitHub](https://github.com/Vitalini/ebb-ai); it ships as the npm package [`@ebb-ai/mcp`](https://www.npmjs.com/package/@ebb-ai/mcp) and is listed on [Glama](https://glama.ai/mcp/servers/Vitalini/ebb-ai) with an A score.
 
 ### Books and writing
 
