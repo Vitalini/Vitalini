@@ -9,6 +9,5 @@
     "ComposioHQ/awesome-claude-skills",
     "segment-integrations/analytics.js-integration-curebit"
   ],
-  "denyPrs": [],
-  "maxPrsPerRepo": 3
+  "denyPrs": []
 }

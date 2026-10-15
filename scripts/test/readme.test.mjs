@@ -4,22 +4,25 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { select } from '../lib/data.mjs';
+import { renderReadmeBlock } from '../lib/render.mjs';
 
 const cli = new URL('../oss-card.mjs', import.meta.url).pathname;
 const fixture = new URL('../fixtures/prs.json', import.meta.url).pathname;
-const golden = readFileSync(new URL('./snapshots/table.md', import.meta.url), 'utf8');
 const before = '# Title\n\nIntro text.\n\n<!-- oss:start -->\n';
 const after = '<!-- oss:end -->\n\nOutro text.\n';
 const run = (...args) => spawnSync(process.execPath, [cli, '--fixture', fixture, ...args], { encoding: 'utf8' });
+const config = JSON.parse(readFileSync(new URL('../../oss.config.json', import.meta.url)));
+const block = renderReadmeBlock(select(JSON.parse(readFileSync(fixture, 'utf8')), config));
 const tmp = () => mkdtempSync(join(tmpdir(), 'oss-card-'));
 
 test('replaces only the block between the markers', () => {
   const dir = tmp();
   const readme = join(dir, 'README.md');
-  writeFileSync(readme, `${before}old table\n${after}`);
+  writeFileSync(readme, `${before}| old | table |\n|---|---|\n${after}`);
   const r = run('--out', join(dir, 'out'), '--readme', readme);
   assert.equal(r.status, 0, r.stderr);
-  assert.equal(readFileSync(readme, 'utf8'), `${before}${golden}${after}`);
+  assert.equal(readFileSync(readme, 'utf8'), `${before}${block}${after}`);
 });
 
 test('a second run changes nothing', () => {

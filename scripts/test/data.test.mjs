@@ -5,70 +5,70 @@ import { select, verifyUrl } from '../lib/data.mjs';
 
 const fixture = JSON.parse(readFileSync(new URL('../fixtures/prs.json', import.meta.url)));
 const config = JSON.parse(readFileSync(new URL('../../oss.config.json', import.meta.url)));
-const allRepos = (model) => model.merged.repos.map((r) => r.name);
-const allUrls = (model) => model.merged.repos.flatMap((r) => r.prs.map((p) => p.url));
+const names = (model) => model.repos.map((r) => r.name);
 
-test('fixture yields totals and repo order (count desc, then latest merge desc)', () => {
-  const model = select(fixture, config);
-  assert.equal(model.merged.total, 17);
-  assert.equal(model.merged.repoCount, 7);
-  assert.deepEqual(allRepos(model), [
-    'activepieces/activepieces',
+test('merged and open repositories form one alphabetical set', () => {
+  assert.deepEqual(names(select(fixture, config)), [
     'acme/widgets',
-    'openclaw/openclaw',
-    'Shopify/hydrogen',
-    'n8n-io/n8n',
-    'medusajs/medusa',
+    'activepieces/activepieces',
+    'calcom/cal.diy',
+    'eivindfjeldstad/validate',
     'emmetio/emmet',
+    'manaflow-ai/cmux',
+    'medusajs/medusa',
+    'n8n-io/n8n',
+    'openclaw/openclaw',
+    'paperclipai/paperclip',
+    'Shopify/hydrogen',
+    'vercel/next.js',
   ]);
-  const ap = model.merged.repos[0];
-  assert.equal(ap.count, 10);
-  assert.deepEqual(ap.prs.slice(0, 3).map((p) => p.number), [12390, 8156, 8101]);
 });
 
-test('denied repositories never appear', () => {
-  const repos = allRepos(select(fixture, config));
-  for (const denied of ['Repairex-rgb/repairextech-1', 'import-math/sutra_video_infra', 'Green-Software-Foundation/awesome-green-software']) {
-    assert.ok(!repos.includes(denied), denied);
-  }
+test('each repository appears once with owner, repo and URL', () => {
+  const model = select(fixture, config);
+  assert.equal(new Set(names(model)).size, model.repos.length);
+  assert.deepEqual(model.repos.find((r) => r.name === 'manaflow-ai/cmux'), {
+    name: 'manaflow-ai/cmux',
+    owner: 'manaflow-ai',
+    repo: 'cmux',
+    url: 'https://github.com/manaflow-ai/cmux',
+  });
+});
+
+test('the model carries no PR numbers, counts or dates', () => {
+  const json = JSON.stringify(select(fixture, config).repos);
+  for (const bad of ['number', 'count', 'mergedAt', 'createdAt', 'title', '/pull/']) assert.ok(!json.includes(bad), bad);
+});
+
+test('denied repositories never appear, merged or open', () => {
+  const repos = names(select(fixture, config));
+  for (const denied of config.denyRepos) assert.ok(!repos.includes(denied), denied);
 });
 
 test('excluded owners are dropped case-insensitively', () => {
-  assert.ok(!allRepos(select(fixture, config)).includes('Talkable/x'));
+  assert.ok(!names(select(fixture, config)).includes('Talkable/x'));
 });
 
 test('private repositories are dropped', () => {
-  assert.ok(!allRepos(select(fixture, config)).includes('acme/secret'));
+  assert.ok(!names(select(fixture, config)).includes('acme/secret'));
 });
 
-test('denyPrs drops one PR and keeps its siblings', () => {
-  const url = 'https://github.com/activepieces/activepieces/pull/3238';
-  const model = select(fixture, { ...config, denyPrs: [url] });
-  assert.ok(!allUrls(model).includes(url));
-  assert.equal(model.merged.repos[0].count, 9);
-  assert.equal(model.merged.total, 16);
+test('denyPrs drops a repository only when all its PRs are denied', () => {
+  const emmet = fixture.merged.filter((p) => p.repository.nameWithOwner === 'emmetio/emmet').map((p) => p.url);
+  assert.ok(!names(select(fixture, { ...config, denyPrs: emmet })).includes('emmetio/emmet'));
+  const one = 'https://github.com/activepieces/activepieces/pull/3238';
+  assert.ok(names(select(fixture, { ...config, denyPrs: [one] })).includes('activepieces/activepieces'));
 });
 
-test('open PRs are separate, filtered, and not counted as merged', () => {
-  const model = select(fixture, config);
-  assert.deepEqual(
-    model.open.items.map((i) => `${i.repo}#${i.number}`),
-    [
-      'calcom/cal.diy#28738',
-      'eivindfjeldstad/validate#129',
-      'manaflow-ai/cmux#7994',
-      'manaflow-ai/cmux#7034',
-      'paperclipai/paperclip#15716',
-      'vercel/next.js#92598',
-    ],
-  );
-  assert.ok(!allUrls(model).some((u) => model.open.items.some((i) => i.url === u)));
+test('a repository with only open PRs is included', () => {
+  const model = select({ merged: [], open: fixture.open }, config);
+  assert.ok(names(model).includes('vercel/next.js'));
 });
 
 test('an all-denied input throws and names the filter that emptied it', () => {
   const onlyJunk = { merged: fixture.merged.filter((p) => p.repository.nameWithOwner === 'Green-Software-Foundation/awesome-green-software'), open: [] };
   assert.throws(() => select(onlyJunk, config), /denyRepos/);
-  assert.throws(() => select({ merged: [], open: [] }, config), /no merged pull requests/);
+  assert.throws(() => select({ merged: [], open: [] }, config), /no merged or open pull requests/);
 });
 
 test('shuffled input gives deep-equal output', () => {
@@ -76,10 +76,11 @@ test('shuffled input gives deep-equal output', () => {
   assert.deepEqual(select(reversed, config), select(fixture, config));
 });
 
-test('verify URL reproduces the card filters as a GitHub search', () => {
+test('verify URL reproduces the card filters as a GitHub search without a state filter', () => {
   const q = decodeURIComponent(new URL(verifyUrl(config)).searchParams.get('q'));
   assert.equal(
-    q.split(' ').slice(0, 6).join(' '),
-    'is:pr author:Vitalini is:merged -org:talkable -user:Vitalini -repo:Repairex-rgb/repairextech-1',
+    q.split(' ').slice(0, 5).join(' '),
+    'is:pr author:Vitalini -org:talkable -user:Vitalini -repo:Repairex-rgb/repairextech-1',
   );
+  assert.ok(!q.includes('is:merged') && !q.includes('is:open'));
 });

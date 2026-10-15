@@ -1,4 +1,4 @@
-// Fetch, filter and group external pull requests. `select` is pure; only `fetchPrs` does I/O.
+// Fetch external pull requests and reduce them to the repositories they target. `select` is pure; only `fetchPrs` does I/O.
 
 const GRAPHQL_URL = 'https://api.github.com/graphql';
 
@@ -16,17 +16,17 @@ const SEARCH_QUERY = `query($q: String!, $cursor: String) {
 
 const lower = (s) => s.toLowerCase();
 
-/** Search qualifiers that exclude employer and own repositories. */
+/** Search qualifiers that exclude employer and own repositories; `state` is optional. */
 export function baseQuery(config, state) {
   const owners = config.excludeOwners.map((o) =>
     lower(o) === lower(config.user) ? `-user:${o}` : `-org:${o}`,
   );
-  return [`is:pr`, `author:${config.user}`, `is:${state}`, ...owners].join(' ');
+  return [`is:pr`, `author:${config.user}`, ...(state ? [`is:${state}`] : []), ...owners].join(' ');
 }
 
-/** GitHub search URL that reproduces the merged count shown on the card. */
+/** GitHub search URL that lists the pull requests behind the card (every state, same filters). */
 export function verifyUrl(config) {
-  const q = [baseQuery(config, 'merged'), ...config.denyRepos.map((r) => `-repo:${r}`)].join(' ');
+  const q = [baseQuery(config), ...config.denyRepos.map((r) => `-repo:${r}`)].join(' ');
   return `https://github.com/search?q=${encodeURIComponent(q)}&type=pullrequests`;
 }
 
@@ -79,47 +79,37 @@ function applyFilters(prs, config) {
   return { kept, emptiedBy };
 }
 
-const byDesc = (a, b) => (a < b ? 1 : a > b ? -1 : 0);
+const byName = (a, b) => {
+  const x = lower(a.name);
+  const y = lower(b.name);
+  return x < y ? -1 : x > y ? 1 : 0;
+};
 
-/** Filter and group raw PRs into the model the renderers draw. Throws when no merged PR is left. */
+/**
+ * Filter raw PRs and reduce them to the set of repositories with a merged or an open PR,
+ * sorted alphabetically (case-insensitive). Throws when no repository is left.
+ */
 export function select(raw, config) {
   const merged = applyFilters(raw.merged, config);
-  if (merged.kept.length === 0) {
+  const open = applyFilters(raw.open, config);
+  const kept = [...merged.kept, ...open.kept];
+  if (kept.length === 0) {
+    const emptiedBy = merged.emptiedBy ?? open.emptiedBy;
     throw new Error(
-      merged.emptiedBy
-        ? `No merged pull requests left after the ${merged.emptiedBy} filter`
-        : 'GitHub search returned no merged pull requests',
+      emptiedBy
+        ? `No pull requests left after the ${emptiedBy} filter`
+        : 'GitHub search returned no merged or open pull requests',
     );
   }
 
-  const groups = new Map();
-  for (const p of merged.kept) {
-    const name = p.repository.nameWithOwner;
-    if (!groups.has(name)) groups.set(name, []);
-    groups.get(name).push({ number: p.number, title: p.title, url: p.url, mergedAt: p.mergedAt });
-  }
-  const repos = [...groups].map(([name, prs]) => {
-    prs.sort((a, b) => byDesc(a.mergedAt, b.mergedAt) || b.number - a.number);
-    const [owner, repo] = name.split('/');
-    return { name, owner, repo, url: `https://github.com/${name}`, count: prs.length, prs };
-  });
-  repos.sort(
-    (a, b) => b.count - a.count || byDesc(a.prs[0].mergedAt, b.prs[0].mergedAt) || (a.name < b.name ? -1 : 1),
-  );
+  const names = new Map();
+  for (const p of kept) names.set(lower(p.repository.nameWithOwner), p.repository.nameWithOwner);
+  const repos = [...names.values()]
+    .map((name) => {
+      const [owner, repo] = name.split('/');
+      return { name, owner, repo, url: `https://github.com/${name}` };
+    })
+    .sort(byName);
 
-  const items = applyFilters(raw.open, config)
-    .kept.map((p) => ({
-      repo: p.repository.nameWithOwner,
-      number: p.number,
-      title: p.title,
-      url: p.url,
-      createdAt: p.createdAt,
-    }))
-    .sort((a, b) => (a.repo < b.repo ? -1 : a.repo > b.repo ? 1 : b.number - a.number));
-
-  return {
-    merged: { total: merged.kept.length, repoCount: repos.length, repos },
-    open: { items },
-    verifyUrl: verifyUrl(config),
-  };
+  return { repos, verifyUrl: verifyUrl(config) };
 }

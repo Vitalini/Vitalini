@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Generate the open-source impact card (light + dark SVG) and the README table.
+// Generate the open-source contributions card (light + dark SVG) and the README block that links it.
 // Usage: node scripts/oss-card.mjs [--fixture <prs.json>] [--out <dir>] [--readme <README.md>] [--config <oss.config.json>]
 // Live mode reads GH_TOKEN. Nothing is written unless every step succeeds.
 
@@ -7,7 +7,7 @@ import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { fetchPrs, select } from './lib/data.mjs';
-import { renderReadmeBlock, renderSvg, headerLine } from './lib/render.mjs';
+import { renderReadmeBlock, renderSvg } from './lib/render.mjs';
 
 const START = '<!-- oss:start -->';
 const END = '<!-- oss:end -->';
@@ -40,8 +40,8 @@ async function main() {
   const model = select(raw, config);
 
   const files = [
-    [join(values.out, 'oss-light.svg'), renderSvg(model, 'light', config.maxPrsPerRepo)],
-    [join(values.out, 'oss-dark.svg'), renderSvg(model, 'dark', config.maxPrsPerRepo)],
+    [join(values.out, 'oss-light.svg'), renderSvg(model, 'light')],
+    [join(values.out, 'oss-dark.svg'), renderSvg(model, 'dark')],
   ];
   if (values.readme) {
     files.push([values.readme, replaceBlock(readFileSync(values.readme, 'utf8'), renderReadmeBlock(model))]);
@@ -49,7 +49,7 @@ async function main() {
 
   mkdirSync(values.out, { recursive: true });
   for (const [path, content] of files) writeAtomic(path, content);
-  console.log(`${headerLine(model)}; ${model.open.items.length} in review`);
+  console.log(`${model.repos.length} repositories: ${model.repos.map((r) => r.name).join(', ')}`);
 }
 
 main().catch((err) => {
