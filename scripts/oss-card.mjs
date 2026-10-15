@@ -3,11 +3,12 @@
 // Usage: node scripts/oss-card.mjs [--fixture <prs.json>] [--out <dir>] [--readme <README.md>] [--config <oss.config.json>]
 // Live mode reads GH_TOKEN. Nothing is written unless every step succeeds.
 
-import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { fetchPrs, select } from './lib/data.mjs';
 import { renderReadmeBlock, renderSvg } from './lib/render.mjs';
+import { writeAtomic } from './lib/write.mjs';
 
 const START = '<!-- oss:start -->';
 const END = '<!-- oss:end -->';
@@ -17,11 +18,6 @@ function replaceBlock(readme, block) {
   const e = readme.indexOf(END);
   if (s === -1 || e === -1 || e < s) throw new Error(`README is missing the ${START} / ${END} markers`);
   return `${readme.slice(0, s + START.length)}\n${block}${readme.slice(e)}`;
-}
-
-function writeAtomic(path, content) {
-  writeFileSync(`${path}.tmp`, content);
-  renameSync(`${path}.tmp`, path);
 }
 
 async function main() {

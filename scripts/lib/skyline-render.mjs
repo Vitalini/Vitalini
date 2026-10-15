@@ -50,7 +50,10 @@ function hexToRgb(hex) {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 const rgbToHex = (rgb) => `#${rgb.map((v) => Math.round(v).toString(16).padStart(2, '0')).join('')}`;
-const mix = (a, b, t) => rgbToHex(hexToRgb(a).map((v, i) => v + (hexToRgb(b)[i] - v) * t));
+function mix(a, b, t) {
+  const to = hexToRgb(b);
+  return rgbToHex(hexToRgb(a).map((v, i) => v + (to[i] - v) * t));
+}
 
 /** Ramp color at t in [0, 1], linear between stops. */
 export function rampColor(ramp, t) {

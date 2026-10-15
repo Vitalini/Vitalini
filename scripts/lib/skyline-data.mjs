@@ -1,6 +1,6 @@
 // Fetch the contribution calendar and reduce it to a render model. Only `fetchCalendar` does I/O.
 
-const GRAPHQL_URL = 'https://api.github.com/graphql';
+import { graphql } from './github.mjs';
 
 const CALENDAR_QUERY = `query($login: String!) {
   user(login: $login) {
@@ -16,14 +16,7 @@ const CALENDAR_QUERY = `query($login: String!) {
 /** Raw GraphQL response body (the same shape as scripts/fixtures/calendar.json). */
 export async function fetchCalendar(login, token) {
   if (!token) throw new Error('GITHUB_TOKEN is not set');
-  const res = await fetch(GRAPHQL_URL, {
-    method: 'POST',
-    headers: { Authorization: `bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query: CALENDAR_QUERY, variables: { login } }),
-  });
-  if (!res.ok) throw new Error(`GitHub GraphQL HTTP ${res.status}`);
-  const body = await res.json();
-  if (body.errors?.length) throw new Error(`GitHub GraphQL error: ${body.errors[0].message}`);
+  const body = await graphql({ query: CALENDAR_QUERY, variables: { login }, token });
   if (!body.data?.user) throw new Error(`GitHub user "${login}" not found`);
   return body;
 }

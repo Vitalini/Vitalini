@@ -1,6 +1,6 @@
 // Fetch external pull requests and reduce them to the repositories they target. `select` is pure; only `fetchPrs` does I/O.
 
-const GRAPHQL_URL = 'https://api.github.com/graphql';
+import { graphql } from './github.mjs';
 
 const SEARCH_QUERY = `query($q: String!, $cursor: String) {
   search(query: $q, type: ISSUE, first: 100, after: $cursor) {
@@ -34,14 +34,7 @@ async function search(q, token) {
   const nodes = [];
   let cursor = null;
   do {
-    const res = await fetch(GRAPHQL_URL, {
-      method: 'POST',
-      headers: { Authorization: `bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: SEARCH_QUERY, variables: { q, cursor } }),
-    });
-    if (!res.ok) throw new Error(`GitHub GraphQL HTTP ${res.status} for "${q}"`);
-    const body = await res.json();
-    if (body.errors?.length) throw new Error(`GitHub GraphQL error for "${q}": ${body.errors[0].message}`);
+    const body = await graphql({ query: SEARCH_QUERY, variables: { q, cursor }, token, context: ` for "${q}"` });
     const page = body.data.search;
     nodes.push(...page.nodes);
     cursor = page.pageInfo.hasNextPage ? page.pageInfo.endCursor : null;
