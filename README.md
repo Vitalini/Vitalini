@@ -6,7 +6,7 @@
 
 ### Vitalii Borovyk
 
-- Director of Frontend Engineering at [Talkable](https://www.talkable.com), referral and loyalty programs for 500+ US brands. Atlanta, GA.
+- Director of Frontend Engineering at [Talkable](https://www.talkable.com), referral and loyalty programs for 500+ US brands.
 - Author of [EBB AI](https://ebb-ai.com), a carbon-aware MCP scheduler for agentic AI.
 - Author of the [Practical AI](https://www.amazon.com/stores/Vitalii-Borovyk/author/B0H24CJSV3) book series about using AI at work and in everyday life.
 - Writes about AI in engineering teams: [How AI helps me at work](https://www.talkable.com/blog/how-ai-helps-team-manager).
