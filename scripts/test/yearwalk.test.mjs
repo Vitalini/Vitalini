@@ -110,29 +110,32 @@ test('tooltips: one <title> per week with the date range', () => {
   }
 });
 
-test('a challenge on every plateau, on its top; set pieces on the strongest weeks; no repeats in a row', () => {
+test('a different challenge on every week, on its plateau top; set pieces on the strongest weeks', () => {
   const { terrain, challenges, peakIndex } = scene(model, 'week');
+  assert.ok(Object.keys(CHALLENGES).length >= 56, 'registry size');
   assert.equal(challenges.length, 53);
+  assert.equal(new Set(challenges.map((c) => c.type)).size, 53, 'every week a different kind');
   challenges.forEach((c, i) => {
     const b = terrain.buckets[c.bucket];
     assert.equal(c.bucket, i);
     assert.equal(c.y, BASE - b.h, c.type);
     assert.ok(c.x >= b.flat0 && c.x <= b.flat1, `${c.type} x ${c.x} outside ${b.flat0}..${b.flat1}`);
-    if (i) assert.notEqual(c.type, challenges[i - 1].type, `week ${i}: same challenge twice in a row`);
     const seasons = CHALLENGES[c.type].seasons;
     if (seasons) assert.ok(seasons.includes(bucketSeason(model, b)), `${c.type} out of season`);
   });
   assert.equal(challenges.find((c) => c.type === 'campfire').bucket, peakIndex);
   const ranked = terrain.buckets.map((b, i) => i).sort((a, c) => terrain.buckets[c].sum - terrain.buckets[a].sum || a - c);
   const rank = (i) => ranked.indexOf(i);
-  for (const c of challenges.filter((c) => c.type === 'boulder')) {
-    assert.ok(rank(c.bucket) < Math.ceil(53 * 0.1));
-    assert.ok(terrain.buckets[c.bucket + 1].h < terrain.buckets[c.bucket].h);
-  }
-  for (const c of challenges.filter((c) => c.type === 'tree')) assert.ok(rank(c.bucket) < Math.ceil(53 * 0.25));
-  const minis = new Set(challenges.map((c) => c.type).filter((t) => !SET_PIECES.includes(t)));
-  assert.ok(minis.size >= 10, `only ${minis.size} kinds of mini-challenge`);
+  const of = (t) => challenges.find((c) => c.type === t);
+  assert.ok(rank(of('boulder').bucket) < Math.ceil(53 * 0.1) && terrain.buckets[of('boulder').bucket + 1].h < of('boulder').y * 0 + terrain.buckets[of('boulder').bucket].h);
+  assert.ok(rank(of('boulder-uphill').bucket) < Math.ceil(53 * 0.1) && terrain.buckets[of('boulder-uphill').bucket + 1].h > terrain.buckets[of('boulder-uphill').bucket].h);
+  for (const t of ['tree', 'tree-axe', 'apple-tree']) assert.ok(rank(of(t).bucket) < Math.ceil(53 * 0.25), t);
   for (const t of MINIS) assert.ok(CHALLENGES[t].dur >= 0.8 && CHALLENGES[t].dur <= 1.5, t);
+  // The live-size year (371 days) also gets 53 distinct kinds; day buckets reuse kinds, never side by side.
+  const full = toModel(calendar(371, '2025-10-12', (i) => (i * 7) % 11));
+  assert.equal(new Set(scene(full, 'week').challenges.map((c) => c.type)).size, 53);
+  const days = scene(full, 'day').challenges;
+  days.forEach((c, i) => i && assert.notEqual(c.type, days[i - 1].type));
   assert.deepEqual(scene(model, 'week').challenges, challenges, 'deterministic');
 });
 
@@ -167,15 +170,19 @@ test('walker timing: linear with explicit keyTimes, walking ~40 px/s, climbing s
   for (const s of route.segs.filter((s) => s.mode === 'climb' && s.from[0] === s.to[0])) assert.ok(Math.abs(speed(s) - SPEED.climb) < 1e-6);
   assert.ok(SPEED.climb < SPEED.walk);
   for (const c of challenges) {
-    const seg = route.segs.find((s) => s.t0 === c.t0 && s.t1 === c.t1);
-    assert.ok(seg, `${c.type}: no segment for its window`);
-    assert.equal(seg.mode, CHALLENGES[c.type].pose);
-    assert.ok(Math.abs(c.t1 - c.t0 - CHALLENGES[c.type].dur) < 1e-9);
-    assert.equal(seg.from[1], -terrain.buckets[c.bucket].h);
-    if (!CHALLENGES[c.type].move) assert.deepEqual(seg.from, seg.to, `${c.type}: he moves during the action`);
-    assert.ok(Math.abs(seg.from[0] + X0 - c.stop) < 0.011);
+    const spec = CHALLENGES[c.type];
+    const segs = route.segs.filter((s) => s.t0 >= c.t0 - 1e-9 && s.t1 <= c.t1 + 1e-9);
+    assert.deepEqual(segs.map((s) => s.mode), spec.phases.map(([p]) => p), `${c.type}: phases`);
+    assert.ok(Math.abs(segs[0].t0 - c.t0) < 1e-9 && Math.abs(segs.at(-1).t1 - c.t1) < 1e-9, `${c.type}: window`);
+    assert.ok(Math.abs(c.t1 - c.t0 - spec.dur) < 1e-9);
+    for (const s of segs) {
+      assert.equal(s.from[1], -terrain.buckets[c.bucket].h);
+      assert.equal(s.to[1], -terrain.buckets[c.bucket].h);
+      if (!spec.move) assert.deepEqual(s.from, s.to, `${c.type}: he moves during the action`);
+    }
+    assert.ok(Math.abs(segs[0].from[0] + X0 - c.stop) < 0.011);
   }
-  const motion = light.match(/<animateMotion [^>]*>/)[0];
+  const motion = light.match(/<animateMotion values=[^>]*>/)[0];
   assert.match(motion, /calcMode="linear"/);
   assert.match(motion, new RegExp(`dur="${Math.round(route.loop * 100) / 100}s"`));
   assert.match(motion, /repeatCount="indefinite"/);

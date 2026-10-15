@@ -106,77 +106,155 @@ export function hash(str) {
   return h;
 }
 
-/**
- * Every challenge: the walker pose while doing it, its length in seconds, `move` (px he advances
- * during it; 0 = he stands still), `off` (anchor offset from the plateau middle), `reach` (how far
- * left of the anchor he stands or starts), and the seasons it may appear in (all when absent).
- * The first four are the set pieces on the strongest weeks; the rest are the quick mini-challenges.
- */
-export const CHALLENGES = {
-  campfire: { pose: 'sit', dur: 2.6, move: 0, off: 2, reach: 8 },
-  boulder: { pose: 'push', dur: 2.0, move: 0, off: 2.5, reach: 8.4 },
-  tree: { pose: 'saw', dur: 2.0, move: 0, off: 2, reach: 6.5 },
-  drift: { pose: 'shovel', dur: 1.8, move: 0, off: 1, reach: 7.5 },
-  puddle: { pose: 'jump', dur: 0.8, move: 10, off: 0, reach: 5, seasons: ['spring', 'summer', 'autumn'] },
-  fence: { pose: 'jump', dur: 0.9, move: 10, off: 0, reach: 5 },
-  log: { pose: 'balance', dur: 1.1, move: 9, off: 0, reach: 4.5 },
-  bush: { pose: 'chop', dur: 1.1, move: 0, off: 2, reach: 6 },
-  bee: { pose: 'swat', dur: 1.0, move: 0, off: 2, reach: 4, seasons: ['spring', 'summer'] },
-  mushroom: { pose: 'crouch', dur: 1.0, move: 0, off: 2, reach: 4, seasons: ['spring', 'summer', 'autumn'] },
-  cat: { pose: 'crouch', dur: 1.2, move: 0, off: 2.5, reach: 5 },
-  bird: { pose: 'wave', dur: 0.9, move: 0, off: 3, reach: 6 },
-  rock: { pose: 'push', dur: 1.0, move: 0, off: 2, reach: 5.5 },
-  pinecone: { pose: 'kick', dur: 0.8, move: 0, off: 2, reach: 3.5, seasons: ['autumn'] },
-  ice: { pose: 'slip', dur: 1.0, move: 0, off: 0, reach: 0, seasons: ['winter'] },
-  shake: { pose: 'shake', dur: 0.9, move: 0, off: 0, reach: 0, seasons: ['winter'] },
-  flask: { pose: 'drink', dur: 0.9, move: 0, off: 0, reach: 0 },
-  binoculars: { pose: 'look', dur: 1.0, move: 0, off: 0, reach: 0 },
-};
-export const SET_PIECES = ['campfire', 'boulder', 'tree', 'drift'];
-export const MINIS = Object.keys(CHALLENGES).filter((k) => !SET_PIECES.includes(k));
+const W = ['winter'];
+const SP = ['spring'];
+const SU = ['summer'];
+const AU = ['autumn'];
+const WARM = ['spring', 'summer', 'autumn'];
 
 /**
- * One challenge on every plateau. Set pieces go to the strongest buckets: the campfire to the busiest,
- * up to 2 boulders in the top 10% (only where the next plateau is lower, so it rolls off), up to 3
- * trees in the rest of the top 25%, a snow drift on the busiest Dec–Feb bucket left. Every other
- * plateau gets a mini-challenge picked by a hash of its first date, allowed in its season, never the
- * same as its left neighbour. Each: { type, bucket, x (anchor), y (plateau top), stop (walker start) }.
+ * The challenge registry. Each kind: `phases` [[pose, seconds], ...] (one pose = one phase),
+ * `move` (px he advances during it; 0 = he stands still), `off` (anchor offset from the plateau
+ * middle), `reach` (how far left of the anchor he starts), `seasons` (all when absent), `needs`
+ * ('down' / 'up': the next plateau must be lower / higher). `set` marks the set pieces that go to the
+ * strongest weeks; every other kind is a quick challenge for one week.
+ */
+const k = (phases, o = {}) => ({ phases: typeof phases === 'string' ? [[phases, o.dur ?? 1.1]] : phases, move: 0, off: 0, reach: 0, ...o });
+export const CHALLENGES = {
+  // set pieces
+  campfire: k('sit', { dur: 2.6, off: 2, reach: 8, set: true }),
+  boulder: k('push', { dur: 2.0, off: 2.5, reach: 8.4, set: true, needs: 'down' }),
+  'boulder-uphill': k('push', { dur: 2.0, off: 2.5, reach: 8.4, set: true, needs: 'up' }),
+  tree: k('saw', { dur: 2.0, off: 2, reach: 6.5, set: true }),
+  'tree-axe': k('chop', { dur: 2.0, off: 2, reach: 6, set: true }),
+  'apple-tree': k([['reach', 0.8], ['eat', 0.8]], { off: 2.5, reach: 4.5, set: true, seasons: ['summer', 'autumn'] }),
+  drift: k('shovel', { dur: 1.8, off: 1, reach: 7.5, set: true, seasons: W }),
+  // the first minis
+  puddle: k('jump', { dur: 0.9, move: 10, reach: 5, seasons: WARM }),
+  fence: k('jump', { dur: 1.0, move: 10, reach: 5 }),
+  log: k('balance', { dur: 1.1, move: 9, reach: 4.5 }),
+  bush: k('chop', { dur: 1.1, off: 2, reach: 6 }),
+  bee: k('swat', { dur: 1.0, off: 2, reach: 4, seasons: ['spring', 'summer'] }),
+  mushroom: k([['crouch', 0.5], ['eat', 0.6]], { off: 2, reach: 4, seasons: WARM }),
+  cat: k('crouch', { dur: 1.2, off: 2.5, reach: 5 }),
+  bird: k('wave', { dur: 0.9, off: 3, reach: 6 }),
+  rock: k('push', { dur: 1.0, off: 2, reach: 5.5 }),
+  pinecone: k('kick', { dur: 0.9, off: 2, reach: 3.5, seasons: AU }),
+  ice: k('slip', { dur: 1.0, seasons: W }),
+  shake: k('shake', { dur: 1.0, seasons: W }),
+  flask: k('drink', { dur: 1.0 }),
+  binoculars: k('look', { dur: 1.0 }),
+  // food
+  sandwich: k([['crouch', 0.5], ['eat', 0.8]], { off: 2, reach: 4.5 }),
+  berries: k([['crouch', 0.5], ['eat', 0.7]], { off: 2, reach: 4.5, seasons: ['summer', 'autumn'] }),
+  honey: k([['reach', 0.6], ['eat', 0.7]], { off: 2.5, reach: 4.5, seasons: ['spring', 'summer'] }),
+  marshmallow: k('roast', { dur: 1.2, off: 3, reach: 7 }),
+  cocoa: k('eat', { dur: 1.1, seasons: W }),
+  icecream: k('eat', { dur: 1.1, seasons: SU }),
+  fish: k([['crouch', 0.6], ['eat', 0.7]], { off: 2, reach: 4.5, seasons: WARM }),
+  watermelon: k('eat', { dur: 1.1, seasons: SU }),
+  carrot: k([['crouch', 0.6], ['eat', 0.7]], { off: 2, reach: 4.5, seasons: WARM }),
+  corn: k('roast', { dur: 1.2, off: 3, reach: 7, seasons: ['summer', 'autumn'] }),
+  pie: k([['crouch', 0.5], ['eat', 0.7]], { off: 2, reach: 4.5, seasons: AU }),
+  coffee: k([['crouch', 0.5], ['eat', 0.7]], { off: 2, reach: 4.5 }),
+  nut: k([['crouch', 0.5], ['eat', 0.7]], { off: 2, reach: 4 }),
+  pizza: k([['look', 0.6], ['eat', 0.8]], {}),
+  banana: k([['eat', 0.7], ['slip', 0.6]], {}),
+  // movement and gear
+  pogo: k('pogo', { dur: 1.2, move: 10, reach: 5 }),
+  trampoline: k('bounce', { dur: 1.2 }),
+  skateboard: k('skate', { dur: 1.0, move: 10, reach: 5 }),
+  bicycle: k('bike', { dur: 1.0, move: 10, reach: 5 }),
+  polevault: k('vault', { dur: 1.1, move: 10, reach: 5 }),
+  limbo: k('limbo', { dur: 1.3, move: 8, reach: 4 }),
+  hopscotch: k('hop', { dur: 1.2, move: 10, reach: 5 }),
+  stilts: k('stilts', { dur: 1.2, move: 9, reach: 4.5 }),
+  sheep: k('ride', { dur: 1.3, move: 8, reach: 4 }),
+  raft: k('raft', { dur: 1.2, move: 6, reach: 3, seasons: WARM }),
+  // nature and the rest
+  snowman: k('crouch', { dur: 1.3, off: 2.5, reach: 5, seasons: W }),
+  snowball: k('toss', { dur: 1.2, off: 3, reach: 6, seasons: W }),
+  sapling: k('pour', { dur: 1.3, off: 3, reach: 6, seasons: ['spring', 'summer'] }),
+  flowers: k('pour', { dur: 1.2, off: 3, reach: 6, seasons: ['spring', 'summer'] }),
+  dandelion: k([['crouch', 0.5], ['blow', 0.7]], { off: 2, reach: 4, seasons: SP }),
+  butterfly: k('net', { dur: 1.2, off: 2, reach: 3, seasons: ['spring', 'summer'] }),
+  rabbit: k('run', { dur: 1.0, move: 6, off: 1, reach: 6 }),
+  ducks: k('toss', { dur: 1.2, off: 3, reach: 6, seasons: WARM }),
+  goose: k('wave', { dur: 1.1, off: 3, reach: 6 }),
+  chest: k('crouch', { dur: 1.3, off: 2.5, reach: 5 }),
+  bell: k('reach', { dur: 1.1, off: 2.5, reach: 3.5 }),
+  selfie: k('selfie', { dur: 1.1 }),
+  telescope: k('peer', { dur: 1.2, off: 2.5, reach: 3.5 }),
+  hammock: k('lie', { dur: 1.4 }),
+  windmill: k('crouch', { dur: 1.2, off: 2.5, reach: 5 }),
+  dig: k('shovel', { dur: 1.2, off: 1, reach: 6.5 }),
+  juggle: k('juggle', { dur: 1.3 }),
+  pushups: k('pushup', { dur: 1.3 }),
+  yoga: k('yoga', { dur: 1.3 }),
+  skiprope: k('skip', { dur: 1.2 }),
+  carrylog: k('carry', { dur: 1.2, move: 8, reach: 4 }),
+  snowroll: k('push', { dur: 1.3, move: 5, off: 2, reach: 6, seasons: W }),
+  kite: k('kite', { dur: 1.3, seasons: WARM }),
+  umbrella: k('umbrella', { dur: 1.2, seasons: SP }),
+  hat: k('hat', { dur: 1.1, seasons: ['spring', 'autumn'] }),
+  map: k('map', { dur: 1.1 }),
+  scarecrow: k('reach', { dur: 1.1, off: 2.5, reach: 4.5, seasons: AU }),
+  football: k('kick', { dur: 1.0, off: 2, reach: 3.5 }),
+  pennant: k('crouch', { dur: 1.0, off: 2, reach: 4 }),
+};
+for (const c of Object.values(CHALLENGES)) c.dur = c.phases.reduce((s, [, d]) => s + d, 0);
+export const SET_PIECES = Object.keys(CHALLENGES).filter((t) => CHALLENGES[t].set);
+export const MINIS = Object.keys(CHALLENGES).filter((t) => !CHALLENGES[t].set);
+
+/**
+ * A different challenge on every plateau. Set pieces go to the strongest buckets: the campfire to
+ * the busiest; one boulder pushed off the edge and one rolled uphill in the top 10% (where the next
+ * plateau is lower / higher); the three tree kinds in the rest of the top 25%; the snow drift on the
+ * busiest Dec–Feb bucket left. Then, strongest bucket first, each plateau takes the unused kind
+ * allowed in its season with the lowest hash of (its first date + kind). No kind is used twice
+ * while unused kinds remain (always, for the 53 weeks of a year).
+ * Each: { type, bucket, x (anchor), y (plateau top), stop (walker start) }.
  */
 export function placeChallenges(model, terrain) {
   const { buckets } = terrain;
-  const ranked = buckets.map((b, i) => i).filter((i) => buckets[i].sum > 0).sort((a, c) => buckets[c].sum - buckets[a].sum || a - c);
+  const order = buckets.map((b, i) => i).sort((a, c) => buckets[c].sum - buckets[a].sum || a - c);
   const type = new Map();
-  const byHash = (list) => [...list].sort((a, c) => hash(buckets[a].first) - hash(buckets[c].first) || a - c);
-  const free = (list) => list.filter((i) => !type.has(i));
-  if (ranked.length) type.set(ranked[0], 'campfire');
-  const top10 = ranked.slice(1, Math.max(2, Math.ceil(buckets.length * 0.1)));
-  // Up to `max` of a set piece, never on two neighbouring plateaus.
-  const spread = (list, kind, max) => {
-    for (const i of list) {
-      if ([...type.values()].filter((t) => t === kind).length >= max) break;
-      if (type.get(i - 1) !== kind && type.get(i + 1) !== kind) type.set(i, kind);
-    }
+  const used = new Set();
+  const take = (i, t) => {
+    type.set(i, t);
+    used.add(t);
   };
-  spread(byHash(free(top10).filter((i) => buckets[i + 1] && buckets[i + 1].h < buckets[i].h)), 'boulder', 2);
-  spread(byHash(free(ranked.slice(0, Math.ceil(buckets.length * 0.25)))), 'tree', 3);
-  const winter = free(ranked.filter((i) => bucketSeason(model, buckets[i]) === 'winter'));
-  if (winter.length) type.set(winter[0], 'drift');
-  const out = [];
-  buckets.forEach((b, i) => {
-    let t = type.get(i);
-    if (!t) {
-      const s = bucketSeason(model, b);
-      const prev = out.at(-1)?.type;
-      const next = type.get(i + 1);
-      const pool = MINIS.filter((k) => (!CHALLENGES[k].seasons || CHALLENGES[k].seasons.includes(s)) && k !== prev && k !== next);
-      t = pool.sort((a, c) => hash(b.first + a) - hash(b.first + c))[0];
-    }
+  const fits = (i, t) => {
     const spec = CHALLENGES[t];
-    const mid = (b.flat0 + b.flat1) / 2;
-    const x = r2(mid + spec.off);
-    out.push({ type: t, bucket: i, x, y: BASE - b.h, stop: r2(x - spec.reach) });
+    const b = buckets[i];
+    if (spec.seasons && !spec.seasons.includes(bucketSeason(model, b))) return false;
+    if (spec.needs === 'down' && !(buckets[i + 1] && buckets[i + 1].h < b.h)) return false;
+    if (spec.needs === 'up' && !(buckets[i + 1] && buckets[i + 1].h > b.h)) return false;
+    return true;
+  };
+  const byHash = (list, t) => [...list].sort((a, c) => hash(buckets[a].first + t) - hash(buckets[c].first + t) || a - c);
+  const free = (list) => list.filter((i) => !type.has(i));
+  const active = order.filter((i) => buckets[i].sum > 0);
+  if (active.length) take(active[0], 'campfire');
+  const top10 = active.slice(1, Math.max(2, Math.ceil(buckets.length * 0.1)));
+  const top25 = active.slice(1, Math.ceil(buckets.length * 0.25));
+  for (const [t, pool] of [['boulder', top10], ['boulder-uphill', top10], ['tree', top25], ['tree-axe', top25], ['apple-tree', top25], ['drift', active]]) {
+    const i = byHash(free(pool).filter((j) => fits(j, t)), t)[0];
+    if (i !== undefined) take(i, t);
+  }
+  for (const i of order) {
+    if (type.has(i)) continue;
+    let pool = MINIS.filter((t) => !used.has(t) && fits(i, t));
+    // More plateaus than kinds (day buckets): reuse, but never next to the same kind.
+    if (!pool.length) pool = MINIS.filter((t) => fits(i, t) && type.get(i - 1) !== t && type.get(i + 1) !== t);
+    take(i, pool.sort((a, c) => hash(buckets[i].first + a) - hash(buckets[i].first + c) || (a < c ? -1 : 1))[0]);
+  }
+  return buckets.map((b, i) => {
+    const t = type.get(i);
+    const spec = CHALLENGES[t];
+    const x = r2((b.flat0 + b.flat1) / 2 + spec.off);
+    return { type: t, bucket: i, x, y: BASE - b.h, stop: r2(x - spec.reach) };
   });
-  return out;
 }
 
 // Speeds in px/s. The loop length is whatever the route adds up to.
@@ -216,11 +294,11 @@ export function walkerRoute(model, terrain, challenges = placeChallenges(model, 
     go(c.stop, y, 'walk');
     c.stop = r2(pos[0] + X0); // where he actually starts (he never walks back)
     c.t0 = clock;
-    if (spec.move) {
-      const to = [r2(pos[0] + spec.move), y];
-      push(to, spec.pose, spec.dur);
-    } else {
-      push(pos, spec.pose, spec.dur);
+    c.phases = [];
+    for (const [pose, dur] of spec.phases) {
+      const to = spec.move ? [r2(pos[0] + (spec.move * dur) / spec.dur), y] : pos;
+      c.phases.push({ pose, t0: clock, t1: clock + dur });
+      push(to, pose, dur);
     }
     c.t1 = clock;
     const t = at.get(i);
