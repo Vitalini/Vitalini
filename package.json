@@ -8,6 +8,8 @@
   "scripts": {
     "test": "node --test \"scripts/test/**/*.test.mjs\"",
     "card": "node scripts/oss-card.mjs --out generated --readme README.md",
-    "card:fixture": "node scripts/oss-card.mjs --fixture scripts/fixtures/prs.json --out generated"
+    "card:fixture": "node scripts/oss-card.mjs --fixture scripts/fixtures/prs.json --out generated",
+    "yearwalk": "node scripts/yearwalk.mjs --out generated",
+    "yearwalk:fixture": "node scripts/yearwalk.mjs --fixture scripts/fixtures/calendar.json --out generated"
   }
 }
