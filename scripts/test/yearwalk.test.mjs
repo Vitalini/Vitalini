@@ -7,7 +7,9 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { caption, dateRange, percentile, toModel, tooltip } from '../lib/calendar.mjs';
 import { THEMES, rampColor, renderYearWalk, scene } from '../lib/yearwalk-render.mjs';
-import { BASE, H_MAX, H_MIN, X0, bucketize, heightFor, layoutTerrain } from '../lib/yearwalk-terrain.mjs';
+import {
+  BASE, CHALLENGES, H_MAX, H_MIN, MINIS, SET_PIECES, SPEED, X0, bucketSeason, bucketize, heightFor, layoutTerrain, poseOf,
+} from '../lib/yearwalk-terrain.mjs';
 
 const fixturePath = fileURLToPath(new URL('../fixtures/calendar.json', import.meta.url));
 const fixture = JSON.parse(readFileSync(fixturePath, 'utf8'));
@@ -108,44 +110,81 @@ test('tooltips: one <title> per week with the date range', () => {
   }
 });
 
-test('challenges sit on their plateau top; the campfire is on the busiest week', () => {
+test('a challenge on every plateau, on its top; set pieces on the strongest weeks; no repeats in a row', () => {
   const { terrain, challenges, peakIndex } = scene(model, 'week');
-  assert.ok(challenges.length >= 6);
-  assert.equal(new Set(challenges.map((c) => c.bucket)).size, challenges.length);
-  for (const c of challenges) {
+  assert.equal(challenges.length, 53);
+  challenges.forEach((c, i) => {
     const b = terrain.buckets[c.bucket];
+    assert.equal(c.bucket, i);
     assert.equal(c.y, BASE - b.h, c.type);
     assert.ok(c.x >= b.flat0 && c.x <= b.flat1, `${c.type} x ${c.x} outside ${b.flat0}..${b.flat1}`);
-  }
+    if (i) assert.notEqual(c.type, challenges[i - 1].type, `week ${i}: same challenge twice in a row`);
+    const seasons = CHALLENGES[c.type].seasons;
+    if (seasons) assert.ok(seasons.includes(bucketSeason(model, b)), `${c.type} out of season`);
+  });
   assert.equal(challenges.find((c) => c.type === 'campfire').bucket, peakIndex);
-  for (const c of challenges.filter((c) => c.type === 'boulder')) assert.ok(terrain.buckets[c.bucket + 1].h < terrain.buckets[c.bucket].h);
+  const ranked = terrain.buckets.map((b, i) => i).sort((a, c) => terrain.buckets[c].sum - terrain.buckets[a].sum || a - c);
+  const rank = (i) => ranked.indexOf(i);
+  for (const c of challenges.filter((c) => c.type === 'boulder')) {
+    assert.ok(rank(c.bucket) < Math.ceil(53 * 0.1));
+    assert.ok(terrain.buckets[c.bucket + 1].h < terrain.buckets[c.bucket].h);
+  }
+  for (const c of challenges.filter((c) => c.type === 'tree')) assert.ok(rank(c.bucket) < Math.ceil(53 * 0.25));
+  const minis = new Set(challenges.map((c) => c.type).filter((t) => !SET_PIECES.includes(t)));
+  assert.ok(minis.size >= 10, `only ${minis.size} kinds of mini-challenge`);
+  for (const t of MINIS) assert.ok(CHALLENGES[t].dur >= 0.8 && CHALLENGES[t].dur <= 1.5, t);
   assert.deepEqual(scene(model, 'week').challenges, challenges, 'deterministic');
 });
 
-test('walker: one loop of at least 30 s; pauses line up with the action windows', () => {
+test('walker is glued to the terrain: every motion sample is on a plateau top or on a ladder/rope', () => {
+  const { terrain, route } = scene(model, 'week');
+  const pts = [route.segs[0].from, ...route.segs.map((s) => s.to)];
+  const onTop = ([x, y]) => terrain.buckets.some((b) => x + X0 >= b.x0 - 1 && x + X0 <= b.x1 + 1 && Math.abs(y + b.h) <= 1);
+  const onProp = ([x, y]) => terrain.transitions.some((t) => x + X0 >= t.xa && x + X0 <= t.xb && -y >= t.low - 1 && -y <= t.high + 1);
+  for (const p of pts) assert.ok(onTop(p) || onProp(p), `walker floats at ${p}`);
+  // Vertical movement happens only on a ladder or rope, at its x, in the climbing pose.
+  for (const s of route.segs) {
+    if (s.from[1] === s.to[1]) continue;
+    assert.equal(s.from[0], s.to[0], 'no diagonal moves');
+    assert.ok(['climb', 'down'].includes(s.mode), s.mode);
+    assert.equal(poseOf(s.mode), 'climb');
+    assert.ok(onProp(s.from) && onProp(s.to));
+  }
+  for (const t of terrain.transitions) assert.ok(t.t1 > t.t0, 'every ladder and rope is climbed');
+  // Ladders and ropes are drawn at every transition.
+  assert.equal((light.match(/stroke-width=".7" fill="none" stroke-linecap="round" opacity="\.(85|7)"/g) ?? []).length, terrain.transitions.length);
+});
+
+test('walker timing: linear with explicit keyTimes, walking ~40 px/s, climbing slower, pauses match action windows', () => {
   const { terrain, challenges, route } = scene(model, 'week');
-  assert.ok(route.loop >= 30, `loop ${route.loop}`);
+  assert.ok(route.loop >= 60 && route.loop <= 130, `loop ${route.loop}`);
   for (let i = 1; i < route.segs.length; i++) {
-    assert.ok(route.segs[i].t0 === route.segs[i - 1].t1);
+    assert.equal(route.segs[i].t0, route.segs[i - 1].t1);
     assert.deepEqual(route.segs[i].from, route.segs[i - 1].to);
   }
-  for (const c of challenges.filter((c) => ['tree', 'boulder', 'campfire', 'drift'].includes(c.type))) {
-    const pause = route.segs.find((s) => s.t0 === c.t0 && s.t1 === c.t1);
-    assert.ok(pause, `${c.type}: no segment for its window`);
-    assert.deepEqual(pause.from, pause.to, `${c.type}: the walker moves during the action`);
-    assert.equal(pause.from[1], -terrain.buckets[c.bucket].h);
-    assert.ok(Math.abs(pause.from[0] + X0 - c.stop) < 0.06);
-  }
-  // Feet are on a plateau top except while climbing.
-  for (const s of route.segs.filter((s) => s.mode === 'walk' && s.from[1] === s.to[1])) {
-    const x = s.from[0] + X0;
-    const b = terrain.buckets.find((b) => x >= b.x0 - 4 && x <= b.x1 + 4 && -b.h === s.from[1]);
-    assert.ok(b, `walk at ${x},${s.from[1]} is not on a plateau`);
+  const speed = (s) => Math.hypot(s.to[0] - s.from[0], s.to[1] - s.from[1]) / (s.t1 - s.t0);
+  for (const s of route.segs.filter((s) => s.mode === 'walk')) assert.ok(Math.abs(speed(s) - SPEED.walk) < 1e-6);
+  for (const s of route.segs.filter((s) => s.mode === 'climb' && s.from[0] === s.to[0])) assert.ok(Math.abs(speed(s) - SPEED.climb) < 1e-6);
+  assert.ok(SPEED.climb < SPEED.walk);
+  for (const c of challenges) {
+    const seg = route.segs.find((s) => s.t0 === c.t0 && s.t1 === c.t1);
+    assert.ok(seg, `${c.type}: no segment for its window`);
+    assert.equal(seg.mode, CHALLENGES[c.type].pose);
+    assert.ok(Math.abs(c.t1 - c.t0 - CHALLENGES[c.type].dur) < 1e-9);
+    assert.equal(seg.from[1], -terrain.buckets[c.bucket].h);
+    if (!CHALLENGES[c.type].move) assert.deepEqual(seg.from, seg.to, `${c.type}: he moves during the action`);
+    assert.ok(Math.abs(seg.from[0] + X0 - c.stop) < 0.011);
   }
   const motion = light.match(/<animateMotion [^>]*>/)[0];
+  assert.match(motion, /calcMode="linear"/);
   assert.match(motion, new RegExp(`dur="${Math.round(route.loop * 100) / 100}s"`));
   assert.match(motion, /repeatCount="indefinite"/);
-  assert.match(light, /dur="1.2s" repeatCount="indefinite"\/><\/use>/); // 0.6 s per walk frame
+  const nv = motion.match(/values="([^"]*)"/)[1].split(';').length;
+  assert.equal(nv, route.segs.length + 1);
+  assert.match(light, /dur="1.2s" repeatCount="indefinite"\/><\/use>/); // walk: 0.6 s per frame
+  assert.match(light, /dur="1s" repeatCount="indefinite"\/><\/use>/); // climb: 0.5 s per frame
+  // Every loop-synced animation shares the walker's loop.
+  for (const a of light.match(/<animate[^>]*begin="3s"[^>]*>/g)) assert.match(a, new RegExp(`dur="${Math.round(route.loop * 100) / 100}s"`));
 });
 
 test('SVG contract: 880x440, <= 300 KB, titled, self-contained, vector, keyTimes valid', () => {
