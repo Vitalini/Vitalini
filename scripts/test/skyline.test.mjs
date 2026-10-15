@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { caption, percentile, toModel } from '../lib/skyline-data.mjs';
 import { FOOT, H_MAX, H_MIN, H_TILE, PITCH_DEG, YAW_DEG, cuboid, heightFor, makeProjector } from '../lib/skyline-geometry.mjs';
-import { layout, rampColor, renderSkyline } from '../lib/skyline-render.mjs';
+import { layout, rampColor, renderSkyline, tooltip } from '../lib/skyline-render.mjs';
 
 const fixturePath = fileURLToPath(new URL('../fixtures/calendar.json', import.meta.url));
 const fixture = JSON.parse(readFileSync(fixturePath, 'utf8'));
@@ -65,13 +65,14 @@ test('cap: days above the cap are drawn at H_MAX and flagged, never taller', () 
   assert.equal(heightFor(1e6, 100).h, H_MAX);
 });
 
-test('no fake data: one break mark per capped day, the peak label shows the real count', () => {
+test('no fake data: one break mark per capped day, no printed peak label', () => {
   const capped = model.weeks.flat().filter((d) => d.count > model.cap).length;
   assert.ok(capped >= 1);
   // Two break-mark paths (front + side) per capped block, in the page background color.
   assert.equal((light.match(/<path fill="#ffffff" d=/g) ?? []).length, capped * 2);
   assert.equal((dark.match(/<path fill="#0d1117" d=/g) ?? []).length, capped * 2);
-  assert.match(light, /class="pk"[^>]*>414 · Sep 29</);
+  assert.ok(!light.includes('class="pk"') && !light.includes('pk-g'));
+  assert.match(light, /<title>414 contributions · Sep 29, 2026<\/title>/);
   assert.match(light, new RegExp(`Days above ${model.cap} contributions are drawn at the cap height with a break mark`));
 });
 
@@ -189,4 +190,15 @@ test('the title uses the display name from the model', () => {
   const named = renderSkyline(toModel(fixture, { name: 'Ada Lovelace' }), 'light');
   assert.match(named, /<title id="sky-title">Ada Lovelace's GitHub/);
   assert.ok(!named.includes('Vitalii Borovyk'));
+});
+
+test('every block group carries exactly one hover <title>', () => {
+  for (const svg of [light, dark]) {
+    const groups = svg.split('\n').filter((l) => l.startsWith('<g transform="translate(') && !l.startsWith('<g transform="translate(-') && !l.includes('class="cam"'));
+    assert.equal(groups.length, model.dayCount);
+    for (const g of groups) assert.equal((g.match(/<title>/g) ?? []).length, 1, g.slice(0, 120));
+  }
+  assert.equal(tooltip({ date: '2026-01-03', count: 0 }), 'No contributions · Jan 3, 2026');
+  assert.equal(tooltip({ date: '2026-09-29', count: 414 }), '414 contributions · Sep 29, 2026');
+  assert.equal(tooltip({ date: '2025-12-01', count: 1 }), '1 contribution · Dec 1, 2025');
 });
