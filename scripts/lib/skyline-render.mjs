@@ -11,6 +11,8 @@ const CAPTION_H = 40;
 const FONT = `-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif`;
 const RISE = 2.6; // seconds, the whole rise wave
 const BLOCK_RISE = 0.7; // seconds, one block
+const PEAK_CHAR_W = 7; // px per character of the 12px bold peak label, for sizing only
+const PEAK_LABEL_DEPTH = 4.5; // world y of the peak label inside the front terrace's depth
 
 export const THEMES = {
   light: {
@@ -140,7 +142,8 @@ export function renderSkyline(model, themeName) {
   const order = [...cells].sort((a, b) => a.y - b.y || a.x - b.x);
   const n = model.weeks.length;
   const blocks = [];
-  let peakLabel = '';
+  let peakAnchor = null;
+  let peakText = '';
   for (const c of order) {
     const { h, t, capped, zero } = heightFor(c.day.count, model.cap);
     const f = cuboid(c.x, c.y, h);
@@ -169,9 +172,8 @@ export function renderSkyline(model, themeName) {
           `<g clip-path="url(#pk)" class="sh"><path fill="#ffffff" opacity=".55" transform="translate(-40 0)" d="M0 ${r1(-h * s - 20)}l${w} 0l-${w * 3} ${r1(h * s + 40)}l-${w} 0Z">` +
           `<animateTransform attributeName="transform" type="translate" values="-40 0;-40 0;60 0;60 0" keyTimes="0;.62;.82;1" dur="5s" begin="${RISE}s" repeatCount="indefinite"/></path></g>`,
       );
-      const [tx, ty] = P([f.box.x1, f.box.y0, h]);
-      const day = `${monthName(c.day.date)} ${Number(c.day.date.slice(8))}`;
-      peakLabel = `<text x="${r1(tx + 5)}" y="${r1(ty - 3)}" class="pk" stroke="${theme.cut}" stroke-width="3" paint-order="stroke">${c.day.count} · ${day}<animate attributeName="opacity" values="0;0;1" keyTimes="0;.8;1" dur="${RISE + 0.4}s" fill="freeze"/></text>`;
+      peakAnchor = P([f.box.x1, f.box.y0, h]);
+      peakText = `${c.day.count} · ${monthName(c.day.date)} ${Number(c.day.date.slice(8))}`;
     }
     const [px, py] = piv.map(r1);
     if (zero) {
@@ -202,6 +204,19 @@ export function renderSkyline(model, themeName) {
     labels.push(`<text x="${r1(x)}" y="${r1(y + 10)}">${m.label}</text>`);
   }
 
+  // Peak label: parked on the empty ground right of the front terrace (nothing is drawn there, and the
+  // month ticks sit on the other side), joined to the bar top by a leader line.
+  let peakLabel = '';
+  if (peakAnchor) {
+    const labelW = peakText.length * PEAK_CHAR_W;
+    const [edgeX, labelY] = P([perRow, rows[1].y0 + PEAK_LABEL_DEPTH, 0]);
+    const labelX = Math.min(edgeX + 14, WIDTH - MARGIN - labelW);
+    peakLabel =
+      `<g class="pk-g"><path d="M${r1(peakAnchor[0])} ${r1(peakAnchor[1])}L${r1(labelX - 4)} ${r1(labelY - 4)}" fill="none" stroke="${theme.peak}" stroke-width="1"/>` +
+      `<text x="${r1(labelX)}" y="${r1(labelY)}" class="pk" stroke="${theme.cut}" stroke-width="3" paint-order="stroke">${peakText}</text>` +
+      `<animate attributeName="opacity" values="0;0;1" keyTimes="0;.8;1" dur="${RISE + 0.4}s" fill="freeze"/></g>`;
+  }
+
   const cx = r1(WIDTH / 2);
   const cy = r1(height / 2);
   const title = `Vitalii Borovyk's GitHub contributions as a 3D skyline: ${caption(model)}`;
@@ -218,7 +233,7 @@ text{font-family:${FONT};font-size:12px;fill:${theme.label}}
 .cap{font-size:15px;font-weight:600;fill:${theme.text}}
 .sig{font-size:11px}
 .pk{font-size:12px;font-weight:600;fill:${theme.peak}}
-@media (prefers-reduced-motion: reduce){.r,.cam{transform:none!important}.sh{display:none}.pk{opacity:1!important}}
+@media (prefers-reduced-motion: reduce){.r,.cam{transform:none!important}.sh{display:none}.pk-g{opacity:1!important}}
 </style>
 <g transform="translate(${cx} ${cy})"><g class="cam">
 <animateTransform attributeName="transform" type="skewX" values="0;1.4;0;-1.4;0" keyTimes="0;.25;.5;.75;1" dur="12s" begin="${RISE}s" repeatCount="indefinite"/>
