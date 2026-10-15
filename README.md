@@ -14,7 +14,7 @@
 ### Open source
 
 <!-- oss:start -->
-<a href="https://github.com/search?q=is%3Apr%20author%3AVitalini%20-org%3Atalkable%20-user%3AVitalini%20-repo%3ARepairex-rgb%2Frepairextech-1%20-repo%3Aimport-math%2Fsutra_video_infra%20-repo%3AGreen-Software-Foundation%2Fawesome-green-software%20-repo%3Apunkpeye%2Fawesome-mcp-servers%20-repo%3AComposioHQ%2Fawesome-claude-skills%20-repo%3Asegment-integrations%2Fanalytics.js-integration-curebit&type=pullrequests">
+<a href="https://github.com/search?q=is%3Apr%20author%3AVitalini%20-org%3Atalkable%20-user%3AVitalini%20-repo%3ARepairex-rgb%2Frepairextech-1%20-repo%3Aimport-math%2Fsutra_video_infra%20-repo%3AGreen-Software-Foundation%2Fawesome-green-software%20-repo%3Apunkpeye%2Fawesome-mcp-servers%20-repo%3AComposioHQ%2Fawesome-claude-skills%20-repo%3Asegment-integrations%2Fanalytics.js-integration-curebit&type=pullrequests" title="All my external pull requests on GitHub">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./generated/oss-dark.svg">
     <source media="(prefers-color-scheme: light)" srcset="./generated/oss-light.svg">
