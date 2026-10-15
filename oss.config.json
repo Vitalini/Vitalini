@@ -1,0 +1,14 @@
+{
+  "user": "Vitalini",
+  "excludeOwners": ["talkable", "Vitalini"],
+  "denyRepos": [
+    "Repairex-rgb/repairextech-1",
+    "import-math/sutra_video_infra",
+    "Green-Software-Foundation/awesome-green-software",
+    "punkpeye/awesome-mcp-servers",
+    "ComposioHQ/awesome-claude-skills",
+    "segment-integrations/analytics.js-integration-curebit"
+  ],
+  "denyPrs": [],
+  "maxPrsPerRepo": 3
+}

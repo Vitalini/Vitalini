@@ -1,0 +1,13 @@
+{
+  "name": "vitalini-profile",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test \"scripts/test/**/*.test.mjs\"",
+    "card": "node scripts/oss-card.mjs --out generated --readme README.md",
+    "card:fixture": "node scripts/oss-card.mjs --fixture scripts/fixtures/prs.json --out generated"
+  }
+}
