@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { caption, percentile, toModel } from '../lib/skyline-data.mjs';
 import { FOOT, H_MAX, H_MIN, H_TILE, PITCH_DEG, YAW_DEG, cuboid, heightFor, makeProjector } from '../lib/skyline-geometry.mjs';
-import { layout, rampColor, renderSkyline, tooltip } from '../lib/skyline-render.mjs';
+import { THEMES, layout, rampColor, renderSkyline, tooltip } from '../lib/skyline-render.mjs';
 
 const fixturePath = fileURLToPath(new URL('../fixtures/calendar.json', import.meta.url));
 const fixture = JSON.parse(readFileSync(fixturePath, 'utf8'));
@@ -65,15 +65,31 @@ test('cap: days above the cap are drawn at H_MAX and flagged, never taller', () 
   assert.equal(heightFor(1e6, 100).h, H_MAX);
 });
 
-test('no fake data: one break mark per capped day, no printed peak label', () => {
+test('capped days are plain bars: no break marks, no printed peak label, cap stated in the desc', () => {
   const capped = model.weeks.flat().filter((d) => d.count > model.cap).length;
   assert.ok(capped >= 1);
-  // Two break-mark paths (front + side) per capped block, in the page background color.
-  assert.equal((light.match(/<path fill="#ffffff" d=/g) ?? []).length, capped * 2);
-  assert.equal((dark.match(/<path fill="#0d1117" d=/g) ?? []).length, capped * 2);
+  // No page-background paths (the old break marks) on any block.
+  assert.equal((light.match(/<path fill="#ffffff" d=/g) ?? []).length, 0);
+  assert.equal((dark.match(/<path fill="#0d1117" d=/g) ?? []).length, 0);
   assert.ok(!light.includes('class="pk"') && !light.includes('pk-g'));
   assert.match(light, /<title>414 contributions · Sep 29, 2026<\/title>/);
-  assert.match(light, new RegExp(`Days above ${model.cap} contributions are drawn at the cap height with a break mark`));
+  assert.match(light, new RegExp(`Days above ${model.cap} contributions are drawn at the cap height;`));
+});
+
+test('palette is green only: every block top is a ramp color or the zero tile', () => {
+  const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  for (const [name, svg] of [['light', light], ['dark', dark]]) {
+    const { ramp, tile } = THEMES[name];
+    // Top faces are the third path of each block (front, side, top order: side, front, top).
+    const tops = [...svg.matchAll(/<path fill="(#[0-9a-f]{6})" d="[^"]*"\/>(?:<clipPath|<\/g>)/g)].map((m) => m[1]);
+    assert.ok(tops.length >= model.dayCount, `${name}: ${tops.length} tops`);
+    for (const c of tops) {
+      if (c === tile) continue;
+      const [r, g, b] = hex(c);
+      assert.ok(g > r && g > b, `${name}: ${c} is not green`);
+    }
+    assert.ok(tops.includes(ramp.at(-1)), `${name}: the cap color is used`);
+  }
 });
 
 test('projection: known points', () => {

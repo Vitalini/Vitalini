@@ -36,7 +36,7 @@ export const DEFAULT_NAME = 'Vitalii Borovyk';
  * Render model. Every week GitHub returns is kept (53 for "last year"). `total` is GitHub's reported
  * `totalContributions`, so the caption equals the number on the profile page; `daySum` is the sum of
  * the day counts, which the CLI compares against it. `name` is the display name for the title. `cap` is the 99th percentile of active days: taller days are drawn
- * at the cap height with a break mark. `hot` is the 95th percentile: those days get the accent color.
+ * at the cap height (and the darkest ramp color).
  */
 export function toModel(body, { name = DEFAULT_NAME } = {}) {
   const cal = body?.data?.user?.contributionsCollection?.contributionCalendar;
@@ -61,7 +61,6 @@ export function toModel(body, { name = DEFAULT_NAME } = {}) {
     max,
     peak,
     cap: Math.max(1, percentile(active, 99)),
-    hot: Math.max(1, percentile(active, 95)),
   };
 }
 

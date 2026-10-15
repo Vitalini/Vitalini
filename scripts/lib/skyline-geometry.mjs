@@ -26,7 +26,7 @@ export function makeProjector(s, yawDeg = YAW_DEG, pitchDeg = PITCH_DEG) {
 /**
  * Square-root height scale with an honest cap.
  * 0 -> flat tile; 1..cap -> H_MIN..H_MAX on sqrt; above cap -> H_MAX with `capped: true`
- * (the renderer draws a break mark, so a capped bar never pretends to be to scale).
+ * (the description states the cap, so a capped bar is never read as to scale).
  */
 export function heightFor(count, cap) {
   if (count <= 0) return { h: H_TILE, t: 0, capped: false, zero: true };

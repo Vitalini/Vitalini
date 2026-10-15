@@ -14,27 +14,21 @@ const BLOCK_RISE = 0.7; // seconds, one block
 
 export const THEMES = {
   light: {
-    ramp: ['#9be9a8', '#40c463', '#30a14e', '#216e39'],
-    hot: '#f2c14e', // top 5% of active days
-    peak: '#f2600c',
+    ramp: ['#9be9a8', '#40c463', '#30a14e', '#216e39'], // 1 contribution -> the cap
     tile: '#e4e8ec',
     ground: '#f6f8fa',
     grid: '#d0d7de',
     label: '#57606a',
     text: '#24292f',
-    cut: '#ffffff', // break mark on capped bars: the page background
     shade: [0.16, 0.32],
   },
   dark: {
-    ramp: ['#283a8c', '#2f5fb8', '#1f9bb0', '#47d6c4'],
-    hot: '#b79cff',
-    peak: '#ff8a3d',
+    ramp: ['#0e4429', '#006d32', '#26a641', '#39d353'], // GitHub dark-mode greens, 1 contribution -> the cap
     tile: '#1b2230',
     ground: '#111822',
     grid: '#232c3a',
     label: '#8b949e',
     text: '#c9d1d9',
-    cut: '#0d1117',
     shade: [0.24, 0.44],
   },
 };
@@ -62,11 +56,9 @@ export function rampColor(ramp, t) {
   return mix(ramp[i], ramp[i + 1], p - i);
 }
 
-function topColor(day, model, theme, t) {
-  if (day.count === 0) return theme.tile;
-  if (model.peak && day.date === model.peak.date) return theme.peak;
-  if (day.count >= model.hot) return theme.hot;
-  return rampColor(theme.ramp, t);
+/** Green only: zero days are neutral tiles, active days follow the ramp by sqrt-scaled count. */
+function topColor(day, theme, t) {
+  return day.count === 0 ? theme.tile : rampColor(theme.ramp, t);
 }
 
 /** Lay out every day in world space: two terraces, older half at the back. */
@@ -148,9 +140,9 @@ export function renderSkyline(model, themeName) {
   const n = model.weeks.length;
   const blocks = [];
   for (const c of order) {
-    const { h, t, capped, zero } = heightFor(c.day.count, model.cap);
+    const { h, t, zero } = heightFor(c.day.count, model.cap);
     const f = cuboid(c.x, c.y, h);
-    const color = topColor(c.day, model, theme, t);
+    const color = topColor(c.day, theme, t);
     const piv = P(f.pivot);
     const rel = (pts) => pathOf(pts, piv);
     const faces = [
@@ -158,13 +150,6 @@ export function renderSkyline(model, themeName) {
       `<path fill="${mix(color, '#000000', shFront)}" d="${rel(f.front)}"/>`,
       `<path fill="${color}" d="${rel(f.top)}"/>`,
     ];
-    if (capped) {
-      // Axis-break mark: a slanted cut near the top of the bar, the bar is taller than drawn.
-      const { x0, x1, y0, y1 } = f.box;
-      const z = h - 0.75;
-      faces.push(`<path fill="${theme.cut}" d="${rel([[x0, y1, z], [x1, y1, z + 0.16], [x1, y1, z + 0.3], [x0, y1, z + 0.14]])}"/>`);
-      faces.push(`<path fill="${theme.cut}" d="${rel([[x1, y1, z + 0.16], [x1, y0, z + 0.24], [x1, y0, z + 0.38], [x1, y1, z + 0.3]])}"/>`);
-    }
     const isPeak = model.peak && c.day.date === model.peak.date;
     if (isPeak) {
       // Sheen: a light band that sweeps across the top and front faces, clipped to them.
@@ -211,7 +196,7 @@ export function renderSkyline(model, themeName) {
   const title = `${model.name}'s GitHub contributions as a 3D skyline: ${caption(model)}`;
   const desc =
     `One block per day, ${model.dayCount} days in two rows of weeks, older weeks at the back. ` +
-    `Height uses a square-root scale. Days above ${model.cap} contributions are drawn at the cap height with a break mark` +
+    `Height uses a square-root scale. Days above ${model.cap} contributions are drawn at the cap height` +
     (model.peak ? `; the busiest day, ${model.peak.date}, had ${model.peak.count}.` : '.');
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${height}" viewBox="0 0 ${WIDTH} ${height}" role="img" aria-labelledby="sky-title sky-desc">
