@@ -1,0 +1,50 @@
+name: profile
+
+on:
+  schedule:
+    - cron: "17 6 * * *" # daily, off the top of the hour
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: profile
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      # Fails intermittently with RESOURCE_LIMITS_EXCEEDED (upstream issue #163).
+      # It errors before writing, so the committed skyline stays; the steps below still run.
+      - name: 3D contribution skyline
+        uses: yoshi389111/github-profile-3d-contrib@v0.9.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: ${{ github.repository_owner }}
+          # No effect on #163 below 100 repositories: v0.9.3 always asks for 100 in its first query.
+          MAX_REPOS: 100
+
+      - name: Open-source impact card
+        if: always()
+        run: node scripts/oss-card.mjs --out generated --readme README.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit if changed
+        if: always()
+        run: |
+          git add README.md generated profile-3d-contrib
+          if git diff --cached --quiet; then echo "No changes"; exit 0; fi
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "chore: refresh profile graphics"
+          git push
