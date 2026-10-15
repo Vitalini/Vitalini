@@ -8,6 +8,7 @@ export async function graphql({ query, variables, token, context = '' }) {
     method: 'POST',
     headers: { Authorization: `bearer ${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ query, variables }),
+    signal: AbortSignal.timeout(30000),
   });
   if (!res.ok) throw new Error(`GitHub GraphQL HTTP ${res.status}${context}`);
   const body = await res.json();
