@@ -1,51 +1,48 @@
-# Hi, I'm Vitalii Borovyk 👋
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./generated/yearwalk-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="./generated/yearwalk-light.svg">
+  <img alt="Vitalii Borovyk's GitHub contributions in the last year drawn as a pixel-art landscape" src="./generated/yearwalk-light.svg" width="100%">
+</picture>
 
-**Director of Frontend Engineering** at [Talkable](https://talkable.com) · Based in Atlanta, GA 🇺🇸
+### Vitalii Borovyk
 
-I build products that help brands grow through referral marketing and loyalty programs. 12+ years turning complex integrations into elegant, revenue-generating solutions.
+- Director of Frontend Engineering at [Talkable](https://www.talkable.com), referral and loyalty programs for 500+ US brands. Atlanta, GA.
+- Author of [ebb-ai](https://github.com/Vitalini/ebb-ai), a carbon-aware MCP scheduler for agentic AI.
+- Author of the [Practical AI](https://www.amazon.com/stores/Vitalii-Borovyk/author/B0H24CJSV3) book series about using AI at work and in everyday life.
+- Writes about AI in engineering teams: [How AI helps me at work](https://www.talkable.com/blog/how-ai-helps-team-manager).
 
----
+### Open source
 
-### 🚀 What I do
+<!-- oss:start -->
+<a href="https://github.com/search?q=is%3Apr%20author%3AVitalini%20-org%3Atalkable%20-user%3AVitalini%20-repo%3ARepairex-rgb%2Frepairextech-1%20-repo%3Aimport-math%2Fsutra_video_infra%20-repo%3AGreen-Software-Foundation%2Fawesome-green-software%20-repo%3Apunkpeye%2Fawesome-mcp-servers%20-repo%3AComposioHQ%2Fawesome-claude-skills%20-repo%3Asegment-integrations%2Fanalytics.js-integration-curebit&type=pullrequests" title="All my external pull requests on GitHub">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./generated/oss-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="./generated/oss-light.svg">
+    <img alt="Open-source contributions: external repositories I contribute to" src="./generated/oss-light.svg" width="100%">
+  </picture>
+</a>
+<!-- oss:end -->
 
-- 🛍️ **Referral & Loyalty Tech** — building scalable systems used by 500+ US brands (American Eagle, Levi's, Vineyard Vines and more)
-- 🤖 **AI Integration** — embedding AI into development workflows and client-facing tools
-- 👥 **Team Leadership** — managing frontend engineering teams, mentoring engineers
-- 🔗 **Third-party Integrations** — 16+ ESP connectors, CRM systems, analytics platforms
+### ebb-ai
 
----
+[ebb-ai](https://github.com/Vitalini/ebb-ai) is a carbon-aware MCP scheduler for agentic AI. An agent hands it a task that can wait, and ebb-ai runs the task in the cleanest electricity-grid hour before the deadline. It ships as the npm package [`@ebb-ai/mcp`](https://www.npmjs.com/package/@ebb-ai/mcp) and is listed on [Glama](https://glama.ai/mcp/servers/Vitalini/ebb-ai) with an A score.
 
-### 🛠️ Tech Stack
+### Books and writing
 
-![JavaScript](https://img.shields.io/badge/-JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
-![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
-![React](https://img.shields.io/badge/-React-61DAFB?style=flat&logo=react&logoColor=black)
-![Node.js](https://img.shields.io/badge/-Node.js-339933?style=flat&logo=node.js&logoColor=white)
-![Ruby](https://img.shields.io/badge/-Ruby-CC342D?style=flat&logo=ruby&logoColor=white)
-![Liquid](https://img.shields.io/badge/-Liquid-00B4FF?style=flat&logo=shopify&logoColor=white)
+- [Living with OpenClaw](https://www.amazon.com/dp/B0GZ1C497S)
+- [The Resilient Career](https://www.amazon.com/dp/B0H3F8BK54)
+- [100 Prompts You'll Actually Use](https://www.amazon.com/dp/B0H3F3K1C1)
+- [Main Street AI](https://www.amazon.com/dp/B0H3F21B84)
+- [Outsmart AI Scams](https://www.amazon.com/dp/B0H2Y53F8G)
+- [The AI Slash-Command Handbook](https://www.amazon.com/dp/B0H2H7TN9Z)
+- [The Prompt](https://www.amazon.com/dp/B0H2M1XPT7)
+- [AI at Work](https://www.amazon.com/dp/B0H2LWQ2S3)
+- [AI Agents, Made Simple](https://www.amazon.com/dp/B0H2LPMWJ1)
+- [AI for Creators](https://www.amazon.com/dp/B0H2LP4QR6)
+- [Talking to AI](https://www.amazon.com/dp/B0H2LLTDT8)
+- [Which AI Should I Use?](https://www.amazon.com/dp/B0H2DM8F6W)
+- [All books on Amazon](https://www.amazon.com/stores/Vitalii-Borovyk/author/B0H24CJSV3)
 
----
+[How AI Helps Me at Work: A Developer and Team Manager's Experience](https://www.talkable.com/blog/how-ai-helps-team-manager) (Talkable blog)
 
-### 📈 GitHub Stats
-
-![Vitalii's GitHub stats](https://github-readme-stats.vercel.app/api?username=Vitalini&show_icons=true&theme=dark&hide_border=true&count_private=true)
-
----
-
-### 🌍 Open Source
-
-- Contributing to [Activepieces](https://github.com/activepieces/activepieces) — AI workflow automation
-- Previously contributed to [qase-playwright-reporter](https://github.com/qase-tms/qase-javascript) and [wdio-reportportal-reporter](https://github.com/BorisOsipov/wdio-reportportal-reporter)
-
----
-
-### 📝 Latest Writing
-
-- [How AI Helps Me at Work: A Developer and Team Manager's Experience](https://www.talkable.com/blog/how-ai-helps-team-manager)
-
----
-
-### 📫 Connect
-
-[![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/vitalini)
-[![Email](https://img.shields.io/badge/-Email-EA4335?style=flat&logo=gmail&logoColor=white)](mailto:2556969@gmail.com)
+[LinkedIn](https://www.linkedin.com/in/vitalini)

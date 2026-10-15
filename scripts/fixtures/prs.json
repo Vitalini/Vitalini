@@ -1,0 +1,440 @@
+{
+  "merged": [
+    {
+      "number": 215,
+      "title": "Add ebb-ai to AI > Carbon — carbon-aware MCP scheduler",
+      "url": "https://github.com/Green-Software-Foundation/awesome-green-software/pull/215",
+      "createdAt": "2026-05-19T23:51:24Z",
+      "mergedAt": "2026-08-04T05:27:32Z",
+      "repository": {
+        "nameWithOwner": "Green-Software-Foundation/awesome-green-software",
+        "isPrivate": false,
+        "owner": {
+          "login": "Green-Software-Foundation"
+        }
+      }
+    },
+    {
+      "number": 73766,
+      "title": "fix(scripts): docs-spellcheck.sh fails on bash 3.2 (macOS); fix the 2 typos it surfaces",
+      "url": "https://github.com/openclaw/openclaw/pull/73766",
+      "createdAt": "2026-04-28T19:26:16Z",
+      "mergedAt": "2026-05-25T19:56:53Z",
+      "repository": {
+        "nameWithOwner": "openclaw/openclaw",
+        "isPrivate": false,
+        "owner": {
+          "login": "openclaw"
+        }
+      }
+    },
+    {
+      "number": 15009,
+      "title": "fix(admin): handle null sales channel references in product list and detail views",
+      "url": "https://github.com/medusajs/medusa/pull/15009",
+      "createdAt": "2026-04-04T18:32:00Z",
+      "mergedAt": "2026-04-10T10:51:55Z",
+      "repository": {
+        "nameWithOwner": "medusajs/medusa",
+        "isPrivate": false,
+        "owner": {
+          "login": "medusajs"
+        }
+      }
+    },
+    {
+      "number": 28042,
+      "title": "fix(MongoDB Chat Memory Node): Add connection pool limit",
+      "url": "https://github.com/n8n-io/n8n/pull/28042",
+      "createdAt": "2026-04-04T18:31:51Z",
+      "mergedAt": "2026-04-21T09:38:06Z",
+      "repository": {
+        "nameWithOwner": "n8n-io/n8n",
+        "isPrivate": false,
+        "owner": {
+          "login": "n8n-io"
+        }
+      }
+    },
+    {
+      "number": 12390,
+      "title": "fix: prevent trigger badge from overlapping step name text",
+      "url": "https://github.com/activepieces/activepieces/pull/12390",
+      "createdAt": "2026-04-04T18:05:50Z",
+      "mergedAt": "2026-05-17T06:55:45Z",
+      "repository": {
+        "nameWithOwner": "activepieces/activepieces",
+        "isPrivate": false,
+        "owner": {
+          "login": "activepieces"
+        }
+      }
+    },
+    {
+      "number": 3664,
+      "title": "fix: use provided cartId in cartGetDefault before falling back to getCartId",
+      "url": "https://github.com/Shopify/hydrogen/pull/3664",
+      "createdAt": "2026-04-04T17:46:38Z",
+      "mergedAt": "2026-05-12T11:23:31Z",
+      "repository": {
+        "nameWithOwner": "Shopify/hydrogen",
+        "isPrivate": false,
+        "owner": {
+          "login": "Shopify"
+        }
+      }
+    },
+    {
+      "number": 8156,
+      "title": "feat(talkable): add custom field support to purchase and event actions",
+      "url": "https://github.com/activepieces/activepieces/pull/8156",
+      "createdAt": "2025-06-24T13:01:29Z",
+      "mergedAt": "2025-06-26T09:29:48Z",
+      "repository": {
+        "nameWithOwner": "activepieces/activepieces",
+        "isPrivate": false,
+        "owner": {
+          "login": "activepieces"
+        }
+      }
+    },
+    {
+      "number": 8101,
+      "title": "feat(talkable): Add action claimOffer and refactoring",
+      "url": "https://github.com/activepieces/activepieces/pull/8101",
+      "createdAt": "2025-06-17T16:25:56Z",
+      "mergedAt": "2025-06-22T15:00:12Z",
+      "repository": {
+        "nameWithOwner": "activepieces/activepieces",
+        "isPrivate": false,
+        "owner": {
+          "login": "activepieces"
+        }
+      }
+    },
+    {
+      "number": 1,
+      "title": "feat: Fixes and improvements for mobile experience",
+      "url": "https://github.com/import-math/sutra_video_infra/pull/1",
+      "createdAt": "2024-09-26T14:54:32Z",
+      "mergedAt": "2024-09-26T16:24:04Z",
+      "repository": {
+        "nameWithOwner": "import-math/sutra_video_infra",
+        "isPrivate": true,
+        "owner": {
+          "login": "import-math"
+        }
+      }
+    },
+    {
+      "number": 5638,
+      "title": "chore(talkable): removed 'no error on failure' checkbox property",
+      "url": "https://github.com/activepieces/activepieces/pull/5638",
+      "createdAt": "2024-09-17T19:51:24Z",
+      "mergedAt": "2024-09-18T08:57:10Z",
+      "repository": {
+        "nameWithOwner": "activepieces/activepieces",
+        "isPrivate": false,
+        "owner": {
+          "login": "activepieces"
+        }
+      }
+    },
+    {
+      "number": 6,
+      "title": "my changes",
+      "url": "https://github.com/Repairex-rgb/repairextech-1/pull/6",
+      "createdAt": "2024-03-15T18:21:54Z",
+      "mergedAt": "2024-03-15T18:29:38Z",
+      "repository": {
+        "nameWithOwner": "Repairex-rgb/repairextech-1",
+        "isPrivate": true,
+        "owner": {
+          "login": "Repairex-rgb"
+        }
+      }
+    },
+    {
+      "number": 3238,
+      "title": "feat(google-calendar): get all events action",
+      "url": "https://github.com/activepieces/activepieces/pull/3238",
+      "createdAt": "2023-11-21T18:15:22Z",
+      "mergedAt": "2023-11-22T00:19:32Z",
+      "repository": {
+        "nameWithOwner": "activepieces/activepieces",
+        "isPrivate": false,
+        "owner": {
+          "login": "activepieces"
+        }
+      }
+    },
+    {
+      "number": 3062,
+      "title": "fix(talkable): rename package to fix tests and deploy",
+      "url": "https://github.com/activepieces/activepieces/pull/3062",
+      "createdAt": "2023-10-29T08:56:23Z",
+      "mergedAt": "2023-10-29T13:57:53Z",
+      "repository": {
+        "nameWithOwner": "activepieces/activepieces",
+        "isPrivate": false,
+        "owner": {
+          "login": "activepieces"
+        }
+      }
+    },
+    {
+      "number": 3044,
+      "title": "feat(talkable): add \"No Error On Failure\" param for all actions",
+      "url": "https://github.com/activepieces/activepieces/pull/3044",
+      "createdAt": "2023-10-26T14:46:48Z",
+      "mergedAt": "2023-10-26T16:53:40Z",
+      "repository": {
+        "nameWithOwner": "activepieces/activepieces",
+        "isPrivate": false,
+        "owner": {
+          "login": "activepieces"
+        }
+      }
+    },
+    {
+      "number": 2796,
+      "title": "feat(google-drive): added file content type to upload file action",
+      "url": "https://github.com/activepieces/activepieces/pull/2796",
+      "createdAt": "2023-09-24T10:57:22Z",
+      "mergedAt": "2023-09-25T07:54:38Z",
+      "repository": {
+        "nameWithOwner": "activepieces/activepieces",
+        "isPrivate": false,
+        "owner": {
+          "login": "activepieces"
+        }
+      }
+    },
+    {
+      "number": 2760,
+      "title": "feat(Talkable): Add support of new param \"create_offers\" for Origin batch creation",
+      "url": "https://github.com/activepieces/activepieces/pull/2760",
+      "createdAt": "2023-09-20T15:12:35Z",
+      "mergedAt": "2023-09-20T22:09:20Z",
+      "repository": {
+        "nameWithOwner": "activepieces/activepieces",
+        "isPrivate": false,
+        "owner": {
+          "login": "activepieces"
+        }
+      }
+    },
+    {
+      "number": 2444,
+      "title": "feat(talkable):  add find coupon / create event / create batch of events / create purchase / update person and more actions.",
+      "url": "https://github.com/activepieces/activepieces/pull/2444",
+      "createdAt": "2023-09-01T09:38:40Z",
+      "mergedAt": "2023-09-20T05:58:28Z",
+      "repository": {
+        "nameWithOwner": "activepieces/activepieces",
+        "isPrivate": false,
+        "owner": {
+          "login": "activepieces"
+        }
+      }
+    },
+    {
+      "number": 155,
+      "title": "Update snippets.json",
+      "url": "https://github.com/emmetio/emmet/pull/155",
+      "createdAt": "2013-01-30T20:34:23Z",
+      "mergedAt": "2013-01-30T20:35:05Z",
+      "repository": {
+        "nameWithOwner": "emmetio/emmet",
+        "isPrivate": false,
+        "owner": {
+          "login": "emmetio"
+        }
+      }
+    },
+    {
+      "number": 42,
+      "title": "Fix <Select> & \"quoted\" | piped values in the options list",
+      "url": "https://github.com/acme/widgets/pull/42",
+      "createdAt": "2026-03-01T10:00:00Z",
+      "mergedAt": "2026-03-02T10:00:00Z",
+      "repository": {
+        "nameWithOwner": "acme/widgets",
+        "isPrivate": false,
+        "owner": {
+          "login": "acme"
+        }
+      }
+    },
+    {
+      "number": 43,
+      "title": "Improve the performance of the incremental build cache invalidation logic when many workspace packages change at the same time",
+      "url": "https://github.com/acme/widgets/pull/43",
+      "createdAt": "2026-03-05T10:00:00Z",
+      "mergedAt": "2026-03-06T10:00:00Z",
+      "repository": {
+        "nameWithOwner": "acme/widgets",
+        "isPrivate": false,
+        "owner": {
+          "login": "acme"
+        }
+      }
+    },
+    {
+      "number": 7,
+      "title": "Private work that must never show",
+      "url": "https://github.com/acme/secret/pull/7",
+      "createdAt": "2026-02-01T10:00:00Z",
+      "mergedAt": "2026-02-02T10:00:00Z",
+      "repository": {
+        "nameWithOwner": "acme/secret",
+        "isPrivate": true,
+        "owner": {
+          "login": "acme"
+        }
+      }
+    },
+    {
+      "number": 900,
+      "title": "Employer work with a mixed-case owner",
+      "url": "https://github.com/Talkable/x/pull/900",
+      "createdAt": "2026-02-01T10:00:00Z",
+      "mergedAt": "2026-02-03T10:00:00Z",
+      "repository": {
+        "nameWithOwner": "Talkable/x",
+        "isPrivate": false,
+        "owner": {
+          "login": "Talkable"
+        }
+      }
+    }
+  ],
+  "open": [
+    {
+      "number": 16076,
+      "title": "Add Vitalini/ebb-ai to Environment & Nature 🤖🤖🤖",
+      "url": "https://github.com/punkpeye/awesome-mcp-servers/pull/16076",
+      "createdAt": "2026-10-09T20:32:41Z",
+      "mergedAt": null,
+      "repository": {
+        "nameWithOwner": "punkpeye/awesome-mcp-servers",
+        "isPrivate": false,
+        "owner": {
+          "login": "punkpeye"
+        }
+      }
+    },
+    {
+      "number": 129,
+      "title": "Add union types with type: { anyOf: [...] }",
+      "url": "https://github.com/eivindfjeldstad/validate/pull/129",
+      "createdAt": "2026-10-09T18:33:01Z",
+      "mergedAt": null,
+      "repository": {
+        "nameWithOwner": "eivindfjeldstad/validate",
+        "isPrivate": false,
+        "owner": {
+          "login": "eivindfjeldstad"
+        }
+      }
+    },
+    {
+      "number": 15716,
+      "title": "plugins: add Telegram Notifier plugin",
+      "url": "https://github.com/paperclipai/paperclip/pull/15716",
+      "createdAt": "2026-10-09T18:30:53Z",
+      "mergedAt": null,
+      "repository": {
+        "nameWithOwner": "paperclipai/paperclip",
+        "isPrivate": false,
+        "owner": {
+          "login": "paperclipai"
+        }
+      }
+    },
+    {
+      "number": 7994,
+      "title": "Add tab-name search to the workspace sidebar",
+      "url": "https://github.com/manaflow-ai/cmux/pull/7994",
+      "createdAt": "2026-07-13T19:53:31Z",
+      "mergedAt": null,
+      "repository": {
+        "nameWithOwner": "manaflow-ai/cmux",
+        "isPrivate": false,
+        "owner": {
+          "login": "manaflow-ai"
+        }
+      }
+    },
+    {
+      "number": 7034,
+      "title": "Record muted workspace notifications in history as read",
+      "url": "https://github.com/manaflow-ai/cmux/pull/7034",
+      "createdAt": "2026-06-28T23:34:05Z",
+      "mergedAt": null,
+      "repository": {
+        "nameWithOwner": "manaflow-ai/cmux",
+        "isPrivate": false,
+        "owner": {
+          "login": "manaflow-ai"
+        }
+      }
+    },
+    {
+      "number": 877,
+      "title": "Add ebb-ai to Development & Code Tools",
+      "url": "https://github.com/ComposioHQ/awesome-claude-skills/pull/877",
+      "createdAt": "2026-05-19T23:52:37Z",
+      "mergedAt": null,
+      "repository": {
+        "nameWithOwner": "ComposioHQ/awesome-claude-skills",
+        "isPrivate": false,
+        "owner": {
+          "login": "ComposioHQ"
+        }
+      }
+    },
+    {
+      "number": 92598,
+      "title": "fix(eslint-plugin-next): respect pageExtensions in no-html-link-for-pages rule",
+      "url": "https://github.com/vercel/next.js/pull/92598",
+      "createdAt": "2026-04-10T04:03:38Z",
+      "mergedAt": null,
+      "repository": {
+        "nameWithOwner": "vercel/next.js",
+        "isPrivate": false,
+        "owner": {
+          "login": "vercel"
+        }
+      }
+    },
+    {
+      "number": 28738,
+      "title": "fix: add @calcom/api-v2 to dev:api script",
+      "url": "https://github.com/calcom/cal.diy/pull/28738",
+      "createdAt": "2026-04-04T18:11:59Z",
+      "mergedAt": null,
+      "repository": {
+        "nameWithOwner": "calcom/cal.diy",
+        "isPrivate": false,
+        "owner": {
+          "login": "calcom"
+        }
+      }
+    },
+    {
+      "number": 9,
+      "title": "Rename to Talkable",
+      "url": "https://github.com/segment-integrations/analytics.js-integration-curebit/pull/9",
+      "createdAt": "2016-09-28T10:33:59Z",
+      "mergedAt": null,
+      "repository": {
+        "nameWithOwner": "segment-integrations/analytics.js-integration-curebit",
+        "isPrivate": false,
+        "owner": {
+          "login": "segment-integrations"
+        }
+      }
+    }
+  ]
+}
