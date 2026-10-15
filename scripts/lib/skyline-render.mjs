@@ -219,7 +219,7 @@ export function renderSkyline(model, themeName) {
 
   const cx = r1(WIDTH / 2);
   const cy = r1(height / 2);
-  const title = `Vitalii Borovyk's GitHub contributions as a 3D skyline: ${caption(model)}`;
+  const title = `${model.name}'s GitHub contributions as a 3D skyline: ${caption(model)}`;
   const desc =
     `One block per day, ${model.dayCount} days in two rows of weeks, older weeks at the back. ` +
     `Height uses a square-root scale. Days above ${model.cap} contributions are drawn at the cap height with a break mark` +

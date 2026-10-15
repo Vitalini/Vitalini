@@ -30,26 +30,30 @@ export function percentile(sorted, p) {
 
 const weekday = (date) => new Date(`${date}T00:00:00Z`).getUTCDay();
 
+export const DEFAULT_NAME = 'Vitalii Borovyk';
+
 /**
- * Render model. Every week GitHub returns is kept (53 for "last year"), so the caption total equals
- * the number on the profile page. `cap` is the 99th percentile of active days: taller days are drawn
+ * Render model. Every week GitHub returns is kept (53 for "last year"). `total` is GitHub's reported
+ * `totalContributions`, so the caption equals the number on the profile page; `daySum` is the sum of
+ * the day counts, which the CLI compares against it. `name` is the display name for the title. `cap` is the 99th percentile of active days: taller days are drawn
  * at the cap height with a break mark. `hot` is the 95th percentile: those days get the accent color.
  */
-export function toModel(body) {
+export function toModel(body, { name = DEFAULT_NAME } = {}) {
   const cal = body?.data?.user?.contributionsCollection?.contributionCalendar;
   if (!cal?.weeks?.length) throw new Error('calendar has no weeks');
   const weeks = cal.weeks.map((w) =>
     w.contributionDays.map((d) => ({ date: d.date, count: d.contributionCount, weekday: weekday(d.date) })),
   );
   const days = weeks.flat();
-  const total = days.reduce((s, d) => s + d.count, 0);
+  const daySum = days.reduce((s, d) => s + d.count, 0);
   const active = days.filter((d) => d.count > 0).map((d) => d.count).sort((a, b) => a - b);
   const max = active.at(-1) ?? 0;
   const peak = max > 0 ? days.find((d) => d.count === max) : null;
   return {
+    name,
     weeks,
-    total,
-    reportedTotal: cal.totalContributions,
+    total: cal.totalContributions ?? daySum,
+    daySum,
     first: days[0].date,
     last: days.at(-1).date,
     activeDays: active.length,

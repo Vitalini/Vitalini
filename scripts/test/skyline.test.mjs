@@ -32,7 +32,7 @@ test('fixture matches skyline golden files', () => {
 
 test('model: totals match GitHub, caption is computed', () => {
   assert.equal(model.total, 8645);
-  assert.equal(model.total, model.reportedTotal);
+  assert.equal(model.total, model.daySum);
   assert.equal(model.max, 414);
   assert.equal(model.peak.date, '2026-09-29');
   assert.equal(caption(model), '8,645 contributions · Oct 2025 – Oct 2026');
@@ -164,4 +164,28 @@ test('CLI: a broken calendar exits non-zero and leaves existing files untouched'
   const r = spawnSync(process.execPath, [cli, '--fixture', bad, '--out', dir], { encoding: 'utf8' });
   assert.notEqual(r.status, 0);
   assert.equal(readFileSync(join(dir, 'skyline-light.svg'), 'utf8'), 'old');
+});
+
+test('a day-sum mismatch warns on stderr, writes, and the caption uses the reported total', () => {
+  const skewed = structuredClone(fixture);
+  skewed.data.user.contributionsCollection.contributionCalendar.totalContributions = 8650;
+  const m = toModel(skewed);
+  assert.equal(m.total, 8650);
+  assert.equal(m.daySum, 8645);
+  assert.match(caption(m), /^8,650 contributions/);
+
+  const dir = mkdtempSync(join(tmpdir(), 'skyline-'));
+  const path = join(dir, 'calendar.json');
+  writeFileSync(path, JSON.stringify(skewed));
+  const r = spawnSync(process.execPath, [cli, '--fixture', path, '--out', dir], { encoding: 'utf8' });
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stderr, /day counts sum to 8645, GitHub reports 8650/);
+  assert.match(readFileSync(join(dir, 'skyline-light.svg'), 'utf8'), /8,650 contributions/);
+});
+
+test('the title uses the display name from the model', () => {
+  assert.match(light, /<title id="sky-title">Vitalii Borovyk's GitHub/);
+  const named = renderSkyline(toModel(fixture, { name: 'Ada Lovelace' }), 'light');
+  assert.match(named, /<title id="sky-title">Ada Lovelace's GitHub/);
+  assert.ok(!named.includes('Vitalii Borovyk'));
 });
