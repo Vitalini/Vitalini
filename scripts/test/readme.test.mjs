@@ -4,11 +4,12 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { select } from '../lib/data.mjs';
 import { renderReadmeBlock } from '../lib/render.mjs';
 
-const cli = new URL('../oss-card.mjs', import.meta.url).pathname;
-const fixture = new URL('../fixtures/prs.json', import.meta.url).pathname;
+const cli = fileURLToPath(new URL('../oss-card.mjs', import.meta.url));
+const fixture = fileURLToPath(new URL('../fixtures/prs.json', import.meta.url));
 const before = '# Title\n\nIntro text.\n\n<!-- oss:start -->\n';
 const after = '<!-- oss:end -->\n\nOutro text.\n';
 const run = (...args) => spawnSync(process.execPath, [cli, '--fixture', fixture, ...args], { encoding: 'utf8' });

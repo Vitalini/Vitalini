@@ -4,16 +4,17 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { caption, percentile, toModel } from '../lib/skyline-data.mjs';
 import { FOOT, H_MAX, H_MIN, H_TILE, PITCH_DEG, YAW_DEG, cuboid, heightFor, makeProjector } from '../lib/skyline-geometry.mjs';
 import { layout, rampColor, renderSkyline } from '../lib/skyline-render.mjs';
 
-const fixturePath = new URL('../fixtures/calendar.json', import.meta.url).pathname;
+const fixturePath = fileURLToPath(new URL('../fixtures/calendar.json', import.meta.url));
 const fixture = JSON.parse(readFileSync(fixturePath, 'utf8'));
 const model = toModel(fixture);
 const light = renderSkyline(model, 'light');
 const dark = renderSkyline(model, 'dark');
-const cli = new URL('../skyline.mjs', import.meta.url).pathname;
+const cli = fileURLToPath(new URL('../skyline.mjs', import.meta.url));
 
 // Golden files: UPDATE_SNAPSHOTS=1 npm test rewrites them.
 function golden(name, actual) {

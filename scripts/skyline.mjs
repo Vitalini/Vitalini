@@ -8,7 +8,7 @@ import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { DEFAULT_NAME, caption, fetchCalendar, toModel } from './lib/skyline-data.mjs';
 import { renderSkyline } from './lib/skyline-render.mjs';
-import { writeAtomic } from './lib/write.mjs';
+import { writeAllAtomic } from './lib/write.mjs';
 
 async function main() {
   const { values } = parseArgs({
@@ -31,7 +31,7 @@ async function main() {
     [join(values.out, 'skyline-dark.svg'), renderSkyline(model, 'dark')],
   ];
   mkdirSync(values.out, { recursive: true });
-  for (const [path, content] of files) writeAtomic(path, content);
+  writeAllAtomic(files);
   console.log(`${caption(model)}; peak ${model.max}, cap ${model.cap}`);
 }
 

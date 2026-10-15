@@ -5,10 +5,11 @@
 
 import { mkdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { fetchPrs, select } from './lib/data.mjs';
 import { renderReadmeBlock, renderSvg } from './lib/render.mjs';
-import { writeAtomic } from './lib/write.mjs';
+import { writeAllAtomic } from './lib/write.mjs';
 
 const START = '<!-- oss:start -->';
 const END = '<!-- oss:end -->';
@@ -26,7 +27,7 @@ async function main() {
       fixture: { type: 'string' },
       out: { type: 'string', default: 'generated' },
       readme: { type: 'string' },
-      config: { type: 'string', default: new URL('../oss.config.json', import.meta.url).pathname },
+      config: { type: 'string', default: fileURLToPath(new URL('../oss.config.json', import.meta.url)) },
     },
   });
   const config = JSON.parse(readFileSync(values.config, 'utf8'));
@@ -44,7 +45,7 @@ async function main() {
   }
 
   mkdirSync(values.out, { recursive: true });
-  for (const [path, content] of files) writeAtomic(path, content);
+  writeAllAtomic(files);
   console.log(`${model.repos.length} repositories: ${model.repos.map((r) => r.name).join(', ')}`);
 }
 
