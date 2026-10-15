@@ -4,6 +4,7 @@ import { graphql } from './github.mjs';
 
 const SEARCH_QUERY = `query($q: String!, $cursor: String) {
   search(query: $q, type: ISSUE, first: 100, after: $cursor) {
+    issueCount
     pageInfo { hasNextPage endCursor }
     nodes {
       ... on PullRequest {
@@ -24,7 +25,12 @@ export function baseQuery(config, state) {
   return [`is:pr`, `author:${config.user}`, ...(state ? [`is:${state}`] : []), ...owners].join(' ');
 }
 
-/** GitHub search URL that lists the pull requests behind the card (every state, same filters). */
+/**
+ * GitHub search URL for every external pull request (any state, drafts included), with the owner and
+ * repository deny lists applied. Search syntax cannot express "merged or open", so the link shows all
+ * states. Known gap: `denyPrs` cannot be applied here, because search has no qualifier that excludes a
+ * single pull request; PRs on that list still show in the linked search.
+ */
 export function verifyUrl(config) {
   const q = [baseQuery(config), ...config.denyRepos.map((r) => `-repo:${r}`)].join(' ');
   return `https://github.com/search?q=${encodeURIComponent(q)}&type=pullrequests`;
@@ -32,22 +38,26 @@ export function verifyUrl(config) {
 
 async function search(q, token) {
   const nodes = [];
+  let total = 0;
   let cursor = null;
   do {
     const body = await graphql({ query: SEARCH_QUERY, variables: { q, cursor }, token, context: ` for "${q}"` });
     const page = body.data.search;
+    total = page.issueCount;
     nodes.push(...page.nodes);
     cursor = page.pageInfo.hasNextPage ? page.pageInfo.endCursor : null;
   } while (cursor);
+  // GitHub search stops paging at 1,000 results; a short read would silently drop repositories.
+  if (total > nodes.length) throw new Error(`GitHub search reported ${total} results for "${q}" but returned ${nodes.length}`);
   return nodes;
 }
 
-/** Raw search results: `{ merged: PullRequest[], open: PullRequest[] }`. */
+/** Raw search results: `{ merged: PullRequest[], open: PullRequest[] }`. Draft PRs are not counted as open. */
 export async function fetchPrs(config, token) {
   if (!token) throw new Error('GH_TOKEN is not set');
   const [merged, open] = await Promise.all([
     search(baseQuery(config, 'merged'), token),
-    search(baseQuery(config, 'open'), token),
+    search(`${baseQuery(config, 'open')} draft:false`, token),
   ]);
   return { merged, open };
 }

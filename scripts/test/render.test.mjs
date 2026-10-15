@@ -90,7 +90,7 @@ test('light and dark differ only in color values', () => {
 
 test('README block is the linked card only: no table, no PR links', () => {
   const block = renderReadmeBlock(model);
-  assert.ok(block.startsWith(`<a href="${model.verifyUrl}">`));
+  assert.ok(block.startsWith(`<a href="${model.verifyUrl}" title="All my external pull requests on GitHub">`));
   assert.ok(block.includes('srcset="./generated/oss-dark.svg"'));
   assert.ok(!block.includes('|'));
   assert.ok(!block.includes('/pull/'));

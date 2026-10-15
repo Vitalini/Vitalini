@@ -18,6 +18,7 @@ const LABEL_CHARS = 26; // fits a chip at 16px (activepieces/activepieces is 25)
 const TITLE = 'Open-source contributions';
 const SUBTITLE = 'External repositories I contribute to';
 const CARD_ALT = `${TITLE}: external repositories I contribute to`;
+const LINK_TITLE = 'All my external pull requests on GitHub';
 
 const xml = (s) =>
   String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -73,10 +74,10 @@ export function renderSvg(model, theme) {
   ].join('\n');
 }
 
-/** The README block between the oss markers: the card, linked to the GitHub search behind it. */
+/** The README block between the oss markers: the card, linked to a GitHub search of all external PRs. */
 export function renderReadmeBlock(model) {
   return [
-    `<a href="${model.verifyUrl}">`,
+    `<a href="${model.verifyUrl}" title="${LINK_TITLE}">`,
     `  <picture>`,
     `    <source media="(prefers-color-scheme: dark)" srcset="./generated/oss-dark.svg">`,
     `    <source media="(prefers-color-scheme: light)" srcset="./generated/oss-light.svg">`,
