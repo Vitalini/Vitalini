@@ -1,4 +1,3 @@
-<!-- Hero: custom skyline (scripts/skyline.mjs). To switch back to the stock action, point the three paths at ./profile-3d-contrib/profile-night-view.svg (dark) and ./profile-3d-contrib/profile-gitblock.svg (light). -->
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./generated/skyline-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="./generated/skyline-light.svg">

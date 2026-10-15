@@ -23,16 +23,6 @@ jobs:
         with:
           node-version: 22
 
-      # Fails intermittently with RESOURCE_LIMITS_EXCEEDED (upstream issue #163).
-      # It errors before writing, so the committed skyline stays; the steps below still run.
-      - name: 3D contribution skyline
-        uses: yoshi389111/github-profile-3d-contrib@v0.9.3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          USERNAME: ${{ github.repository_owner }}
-          # No effect on #163 below 100 repositories: v0.9.3 always asks for 100 in its first query.
-          MAX_REPOS: 100
-
       - name: Custom contribution skyline
         if: always()
         run: node scripts/skyline.mjs --out generated
@@ -48,7 +38,7 @@ jobs:
       - name: Commit if changed
         if: always()
         run: |
-          git add README.md generated profile-3d-contrib
+          git add README.md generated
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git -c user.name="github-actions[bot]" \
               -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
