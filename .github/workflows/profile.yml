@@ -23,9 +23,9 @@ jobs:
         with:
           node-version: 22
 
-      - name: Custom contribution skyline
+      - name: Year Walk landscape
         if: ${{ !cancelled() }}
-        run: node scripts/skyline.mjs --out generated
+        run: node scripts/yearwalk.mjs --out generated
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
