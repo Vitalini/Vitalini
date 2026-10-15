@@ -1,4 +1,4 @@
-// Fetch the contribution calendar and reduce it to a render model. Only `fetchCalendar` does I/O.
+// Fetch the contribution calendar and reduce it to a model shared by the graphics. Only `fetchCalendar` does I/O.
 
 import { graphql } from './github.mjs';
 
@@ -35,8 +35,8 @@ export const DEFAULT_NAME = 'Vitalii Borovyk';
 /**
  * Render model. Every week GitHub returns is kept (53 for "last year"). `total` is GitHub's reported
  * `totalContributions`, so the caption equals the number on the profile page; `daySum` is the sum of
- * the day counts, which the CLI compares against it. `name` is the display name for the title. `cap` is the 99th percentile of active days: taller days are drawn
- * at the cap height (and the darkest ramp color).
+ * the day counts, which the CLI compares against it. `name` is the display name for the title. `cap` is the
+ * 99th percentile of active days.
  */
 export function toModel(body, { name = DEFAULT_NAME } = {}) {
   const cal = body?.data?.user?.contributionsCollection?.contributionCalendar;
@@ -72,4 +72,22 @@ const monthYear = (date) => `${monthName(date)} ${date.slice(0, 4)}`;
 export function caption(model) {
   const n = model.total.toLocaleString('en-US');
   return `${n} contribution${model.total === 1 ? '' : 's'} · ${monthYear(model.first)} – ${monthYear(model.last)}`;
+}
+
+const dayMonth = (date) => `${monthName(date)} ${Number(date.slice(8))}`;
+
+/** "Oct 1, 2026", "Oct 1–15, 2026", "Sep 28 – Oct 4, 2026", "Dec 28, 2025 – Jan 3, 2026". */
+export function dateRange(first, last) {
+  const y1 = first.slice(0, 4);
+  const y2 = last.slice(0, 4);
+  if (first === last) return `${dayMonth(first)}, ${y1}`;
+  if (y1 !== y2) return `${dayMonth(first)}, ${y1} – ${dayMonth(last)}, ${y2}`;
+  if (first.slice(5, 7) === last.slice(5, 7)) return `${dayMonth(first)}–${Number(last.slice(8))}, ${y1}`;
+  return `${dayMonth(first)} – ${dayMonth(last)}, ${y1}`;
+}
+
+/** Hover text for a span of days: "414 contributions · Sep 29, 2026", "No contributions · Oct 1–15, 2026". */
+export function tooltip(count, first, last = first) {
+  const n = count === 0 ? 'No contributions' : `${count.toLocaleString('en-US')} contribution${count === 1 ? '' : 's'}`;
+  return `${n} · ${dateRange(first, last)}`;
 }

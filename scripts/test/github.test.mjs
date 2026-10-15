@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fetchPrs } from '../lib/data.mjs';
 import { graphql } from '../lib/github.mjs';
-import { fetchCalendar } from '../lib/skyline-data.mjs';
+import { fetchCalendar } from '../lib/calendar.mjs';
 
 const config = JSON.parse(readFileSync(new URL('../../oss.config.json', import.meta.url)));
 const realFetch = globalThis.fetch;
