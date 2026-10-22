@@ -7,14 +7,14 @@
 ### Vitalii Borovyk
 
 - Director of Frontend Engineering at [Talkable](https://www.talkable.com), referral and loyalty programs for 500+ US brands.
-- Author of [EBB AI](https://ebb-ai.com), a carbon-aware MCP scheduler for agentic AI.
+- Author of [Tidegap](https://www.tidegap.com), a carbon-aware MCP scheduler for agentic AI.
 - Author of the [Practical AI](https://www.amazon.com/stores/Vitalii-Borovyk/author/B0H24CJSV3) book series about using AI at work and in everyday life.
 - Writes about AI in engineering teams: [How AI helps me at work](https://www.talkable.com/blog/how-ai-helps-team-manager).
 
 ### Open source
 
 <!-- oss:start -->
-<a href="https://github.com/search?q=is%3Apr%20author%3AVitalini%20-org%3Atalkable%20-user%3AVitalini%20-repo%3ARepairex-rgb%2Frepairextech-1%20-repo%3Aimport-math%2Fsutra_video_infra%20-repo%3AGreen-Software-Foundation%2Fawesome-green-software%20-repo%3Apunkpeye%2Fawesome-mcp-servers%20-repo%3AComposioHQ%2Fawesome-claude-skills%20-repo%3Asegment-integrations%2Fanalytics.js-integration-curebit&type=pullrequests" title="All my external pull requests on GitHub">
+<a href="https://github.com/search?q=is%3Apr%20author%3AVitalini%20-org%3Atalkable%20-user%3AVitalini%20-org%3Atidegap%20-repo%3ARepairex-rgb%2Frepairextech-1%20-repo%3Aimport-math%2Fsutra_video_infra%20-repo%3AGreen-Software-Foundation%2Fawesome-green-software%20-repo%3Apunkpeye%2Fawesome-mcp-servers%20-repo%3AComposioHQ%2Fawesome-claude-skills%20-repo%3Asegment-integrations%2Fanalytics.js-integration-curebit&type=pullrequests" title="All my external pull requests on GitHub">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./generated/oss-dark.svg">
     <source media="(prefers-color-scheme: light)" srcset="./generated/oss-light.svg">
@@ -23,9 +23,9 @@
 </a>
 <!-- oss:end -->
 
-### EBB AI
+### Tidegap
 
-[EBB AI](https://ebb-ai.com) is a carbon-aware MCP scheduler for agentic AI. An agent hands it a task that can wait, and EBB AI runs the task in the cleanest electricity-grid hour before the deadline. Source on [GitHub](https://github.com/Vitalini/ebb-ai); it ships as the npm package [`@ebb-ai/mcp`](https://www.npmjs.com/package/@ebb-ai/mcp) and is listed on [Glama](https://glama.ai/mcp/servers/Vitalini/ebb-ai) with an A score.
+[Tidegap](https://www.tidegap.com) is a carbon-aware scheduler for agentic AI. An agent hands it a task that can wait, and Tidegap runs the task in the cleanest electricity-grid hour before the deadline, through the provider Batch API when the deadline allows. Source on [GitHub](https://github.com/tidegap/tidegap); it ships as [`@tidegap/mcp`](https://www.npmjs.com/package/@tidegap/mcp) on npm and [`tidegap`](https://pypi.org/project/tidegap/) on PyPI, a Claude Code plugin and an OpenClaw plugin, and is listed on [Glama](https://glama.ai/mcp/servers/tidegap/tidegap) with an A score.
 
 ### Books and writing
 

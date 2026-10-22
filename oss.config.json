@@ -1,6 +1,10 @@
 {
   "user": "Vitalini",
-  "excludeOwners": ["talkable", "Vitalini"],
+  "excludeOwners": [
+    "talkable",
+    "Vitalini",
+    "tidegap"
+  ],
   "denyRepos": [
     "Repairex-rgb/repairextech-1",
     "import-math/sutra_video_infra",
