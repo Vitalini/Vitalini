@@ -79,8 +79,8 @@ test('shuffled input gives deep-equal output', () => {
 test('verify URL reproduces the card filters as a GitHub search without a state filter', () => {
   const q = decodeURIComponent(new URL(verifyUrl(config)).searchParams.get('q'));
   assert.equal(
-    q.split(' ').slice(0, 5).join(' '),
-    'is:pr author:Vitalini -org:talkable -user:Vitalini -repo:Repairex-rgb/repairextech-1',
+    q.split(' ').slice(0, 6).join(' '),
+    'is:pr author:Vitalini -org:talkable -user:Vitalini -org:tidegap -repo:Repairex-rgb/repairextech-1',
   );
   assert.ok(!q.includes('is:merged') && !q.includes('is:open'));
 });
