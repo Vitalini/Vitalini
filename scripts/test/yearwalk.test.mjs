@@ -110,6 +110,13 @@ test('tooltips: one <title> per week with the date range', () => {
   }
 });
 
+test('month labels: the current month is labelled at the right edge on its first days; other narrow months are not', () => {
+  // Oct 31, 2025 – Nov 3, 2026: a 1-day first month and a 3-day last month.
+  const svg = renderYearWalk(toModel(calendar(369, '2025-10-31', (i) => i % 4)), 'light');
+  assert.ok(svg.includes(`<text x="${880 - X0}" y="${BASE + 25}" text-anchor="end">Nov</text>`));
+  assert.equal(svg.match(/>Oct<\/text>/g).length, 1);
+});
+
 test('a different challenge on every week, on its plateau top; set pieces on the strongest weeks', () => {
   const { terrain, challenges, peakIndex } = scene(model, 'week');
   assert.ok(Object.keys(CHALLENGES).length >= 56, 'registry size');

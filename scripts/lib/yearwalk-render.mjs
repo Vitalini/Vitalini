@@ -231,9 +231,14 @@ export function renderYearWalk(model, themeName, bucket = 'week') {
   );
 
   // ---------- labels, caption, hover columns ----------
+  // Months narrower than 24 px go unlabelled, except the current one: it is pinned to the right edge.
+  const last = months.at(-1);
   const labels = months
-    .filter((m) => m.x1 - m.x0 >= 24)
-    .map((m) => `<text x="${n((m.x0 + m.x1) / 2)}" y="${BASE + 25}" text-anchor="middle">${monthName(m.date)}</text>`)
+    .filter((m) => m === last || m.x1 - m.x0 >= 24)
+    .map((m) => {
+      const [x, anchor] = m === last ? [right, 'end'] : [(m.x0 + m.x1) / 2, 'middle'];
+      return `<text x="${n(x)}" y="${BASE + 25}" text-anchor="${anchor}">${monthName(m.date)}</text>`;
+    })
     .join('');
   const top = BASE - H_MAX - 30;
   const hover = buckets
